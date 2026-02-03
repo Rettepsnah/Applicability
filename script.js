@@ -1,21 +1,5 @@
-// --- TAB SWITCHING LOGIC (OPPDATERT FOR HEADER-MENY) ---
-function switchTab(tabId) {
-    // Skjul alt innhold
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    // Deaktiver alle meny-knapper (nav-items)
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-
-    // Vis valgt innhold
-    document.getElementById('view-' + tabId).classList.add('active');
-    
-    // Aktiver riktig knapp i headeren
-    const buttons = document.querySelectorAll('.nav-item');
-    if(tabId === 'flowchart') buttons[0].classList.add('active');
-    if(tabId === 'interactive') buttons[1].classList.add('active');
-}
-
-
-// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER - UENDRET) --- 
+// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER) --- 
+// NB: switchTab-funksjonen er fjernet da den ikke lenger er i bruk.
 
 const airportDB = {
     "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
@@ -275,7 +259,7 @@ function renderStep(stepId, pushToHistory = true) {
     if (data.lookupWidget) {
         html += `
         <div class="airport-lookup-wrapper">
-            <label style="font-weight:600; display:block;">Søk på navn eller ICAO-kode:</label>
+            <label style="font-weight:600; display:block; margin-bottom: 15px; font-size: 1.1rem;">Søk på navn eller ICAO-kode:</label>
             <div class="lookup-input-group">
                 <input type="text" id="icao-input" class="lookup-input" placeholder="Eks. ENGM" onkeypress="if(event.key === 'Enter') checkAirport()">
                 <button class="btn btn-primary" onclick="checkAirport()">Sjekk</button>
@@ -291,7 +275,7 @@ function renderStep(stepId, pushToHistory = true) {
         });
     }
 
-    html += `<div class="action-bar ${data.type !== 'selection' ? 'action-bar-center' : ''}" id="action-area" style="${data.type === 'selection' ? 'flex-direction:column; border:none; padding:0;' : ''}">`;
+    html += `<div class="action-bar ${data.type !== 'selection' ? 'action-bar-center' : ''}" id="action-area" style="${data.type === 'selection' ? 'flex-direction:column; border:none; padding:0; margin-top: 30px;' : ''}">`;
 
     if (data.type === 'selection') {
         const choices = data.choices.map(c => `
@@ -311,7 +295,7 @@ function renderStep(stepId, pushToHistory = true) {
         
         html += `
             <div class="selection-grid">${choices}</div>
-            <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
+            <div style="display:flex; justify-content:center; gap:20px; margin-top:40px;">
                  <button class="btn btn-primary" id="btn-cont" disabled onclick="handleResponse(${stepId}, 'continue')">Fortsett</button>
                  <button class="btn btn-outline" onclick="handleResponse(${stepId}, 'none')">Ingen av disse</button>
             </div>
