@@ -3,394 +3,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veileder (EU) 2025/20</title>
+    <title>Veileder (EU) 2025/20 - Ground Handling</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <style>
-        /* --- PROFIL OG VARIABLER --- */
+        /* --- GRUNNLEGGENDE STIL (SORA / CAA STIL) --- */
         :root {
-            /* Farger hentet fra referansebildet */
-            --brand-primary: #3FA9F5; /* Den klare blåfargen */
-            --brand-dark: #2c3e50;    /* Mørk tekstfarge */
-            --brand-hover: #2c8ac9;
-            
-            --bg-page: #ffffff;       /* Hvit bakgrunn som i bildet */
+            --caa-blue: #003057;       
+            --caa-blue-light: #0056b3; 
+            --caa-bg: #f4f6f8;         
             --card-bg: #ffffff;
             
-            /* Info-boks farger fra bildet */
-            --info-bg: #eaf6ff;
-            --info-border: #9dcbf5;
-            --info-text: #2c3e50;
-
-            --text-main: #231f20;
-            --text-light: #595959;
+            --text-main: #333333;
+            --text-muted: #666666;
             
-            --status-green: #e3f9e5;
-            --status-green-text: #007c2e;
-            --status-green-border: #28a745;
-
-            --status-red: #ffe6e6;
-            --status-red-text: #ba160c;
-
-            --status-orange: #fff3cd; /* Lys oransje bakgrunn */
-            --status-orange-text: #d39e00; /* Oransje tekst */
-            --status-orange-border: #ffeeba; /* Oransje border */
-
+            --border-color: #dce1e6;
+            --radius-main: 6px;
             
-            --line-color: #e6e6e6;
-            --border-radius: 4px; /* Litt skarpere hjørner iht. bildet */
-            
-            /* Flatere design (mindre skygge) */
-            --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.05);
-            --shadow-active: 0 4px 20px rgba(63, 169, 245, 0.15);
+            --status-success: #d4edda;
+            --status-success-text: #155724;
+            --status-warning: #fff3cd;
+            --status-warning-text: #856404;
+            --status-danger: #f8d7da;
+            --status-danger-text: #721c24;
+
+            --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
-            background-color: var(--bg-page);
+            font-family: 'Open Sans', sans-serif;
+            background-color: var(--caa-bg);
             color: var(--text-main);
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
+        }
+
+        /* --- HEADER MED LOGO --- */
+        header {
+            background-color: var(--caa-blue);
+            color: white;
+            padding: 0 20px;
+            height: 70px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            overflow-y: scroll;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header-bar {
+        .header-content {
             width: 100%;
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--line-color);
-            height: 50px; 
-            position: fixed;
-            top: 0;
-            z-index: 1000;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        /* ENDRET: Lagt til position relative for å styre absolutte barn */
-        .flow-wrapper {
-            width: 100%;
-            max-width: 750px; 
-            margin: 80px 15px 50px 15px; 
+        .logo {
+            height: 40px;
+            width: auto;
+        }
+
+        header h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            padding-left: 20px;
+            border-left: 1px solid rgba(255,255,255,0.3);
+            line-height: 1.2;
+        }
+
+        /* --- TABS NAVIGATION --- */
+        .tabs-container {
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .tabs {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 15px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 20px 25px;
+            font-family: 'Open Sans', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
             position: relative;
-            min-height: 400px; /* Sikrer at den ikke kollapser helt ved bytte */
+            transition: color 0.2s;
         }
 
-        .flow-line {
-            position: absolute;
-            top: 10px;
-            bottom: 20px;
-            left: 50%;
-            width: 2px;
-            background-color: #f0f0f0;
-            transform: translateX(-50%);
-            z-index: 0;
+        .tab-btn:hover {
+            color: var(--caa-blue);
         }
 
-        /* ENDRET: step-card oppførsel */
-        .step-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            padding: 25px 30px; 
-            margin-bottom: 20px; 
-            /* Fjernet position: relative herfra for å styre det i active/dimmed */
-            text-align: center;
-            transition: all 0.4s ease;
-            border: 1px solid var(--line-color);
-            box-shadow: var(--shadow-subtle);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%; /* Sikrer full bredde */
+        .tab-btn.active {
+            color: var(--caa-blue);
         }
 
-        .step-card::before {
+        .tab-btn.active::after {
             content: '';
             position: absolute;
-            top: -10px; 
-            left: 50%;
-            transform: translateX(-50%);
-            width: 10px;
-            height: 10px;
-            background-color: #dbe1e6;
-            border-radius: 50%;
-            border: 3px solid var(--bg-page);
-            transition: background-color 0.4s;
-            z-index: 15;
-        }
-        
-        .step-card:first-child::before { display: none; }
-
-        /* ENDRET: Active ligger "i flyten" (relative) og øverst */
-        .step-active {
-            position: relative;
-            opacity: 1;
-            transform: translateY(0);
-            box-shadow: var(--shadow-active);
-            border-color: var(--brand-primary); 
-            z-index: 10;
-        }
-        
-        /* ENDRET: Dimmed legges absolute for å ikke ta plass, og skjules */
-        .step-dimmed {
-            position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
-            right: 0;
-            opacity: 0;
-            transform: scale(0.95);
-            pointer-events: none;
-            z-index: 0;
-            visibility: hidden; /* Skjuler den helt for interaksjon */
-        }
-
-        .result-card-highlight {
-            transform: scale(1.02) !important;
-            z-index: 20 !important;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
-        }
-
-        .question-text {
-            font-size: 1.3rem; 
-            font-weight: 700;
-            color: var(--brand-dark);
-            margin-bottom: 10px;
-            line-height: 1.3;
-            max-width: 800px;
-        }
-        
-        .subtext { font-size: 0.95rem; margin-bottom: 15px; color: var(--text-light); }
-
-        .intro-text {
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--text-main);
-            margin-bottom: 20px;
-            text-align: center;
-            max-width: 700px;
-        }
-
-        /* --- BLÅ STIL --- */
-        .disclaimer-box {
-            background-color: var(--info-bg);
-            border: 1px solid var(--info-border);
-            border-left: 5px solid var(--brand-primary); 
-            padding: 15px 20px; 
-            margin: 15px auto;
-            text-align: left;
-            font-size: 0.9rem;
-            color: var(--info-text);
-            max-width: 650px;
-            border-radius: var(--border-radius);
-        }
-        .disclaimer-box strong { 
-            display: block; 
-            margin-bottom: 5px; 
-            color: var(--brand-primary); 
-            font-size: 0.95rem;
-        }
-        .disclaimer-box a { color: var(--brand-primary); font-weight: 700; text-decoration: underline; }
-
-        /* KOMPAKT GRID */
-        .selection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
-            gap: 10px; 
-            margin: 15px 0 20px 0;
-            text-align: left;
             width: 100%;
-            align-items: stretch;
-        }
-        
-        .selection-grid-vertical { 
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+            height: 3px;
+            background-color: var(--caa-blue);
         }
 
-        /* KOMPAKT KNAPPER/VALG */
-        .selection-card {
-            background: #f4f7fa; 
-            border: 2px solid #c5ced6; 
-            border-radius: var(--border-radius);
-            padding: 15px; 
-            cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex;
-            flex-direction: column;
-            height: 100%; 
+        /* --- MAIN CONTAINER --- */
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 15px;
+            flex-grow: 1;
+        }
+
+        /* --- TAB CONTENT AREAS --- */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- CARD STYLE --- */
+        .app-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-main);
+            box-shadow: var(--shadow-card);
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            min-height: 400px;
             position: relative;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .selection-card:hover {
-            border-color: var(--brand-primary);
-            background-color: #ebf5ff; 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 16px rgba(63, 169, 245, 0.2);
-            z-index: 5;
-        }
-
-        .selection-card.selected {
-            border-color: var(--brand-primary);
-            background-color: var(--info-bg);
-            box-shadow: 0 0 0 2px var(--brand-primary) inset;
-            transform: translateY(-1px);
-        }
-
-        .sel-icon {
-            width: 28px; 
-            height: 28px;
-            margin: 0 auto 10px auto;
-            color: var(--brand-primary);
-            display: block;
-        }
-        .sel-icon svg { width: 100%; height: 100%; fill: currentColor; }
-
-        .sel-label {
-            font-weight: 700;
-            font-size: 0.95rem; 
-            color: var(--brand-dark);
-            margin-bottom: 8px;
-            display: block;
+        /* --- FLOWCHART IMAGE STYLE --- */
+        .flowchart-wrapper {
             text-align: center;
-            line-height: 1.3;
-        }
-
-        .inner-info-box {
-            background: #ffffff; 
-            border: 1px solid #e9ecef;
-            border-radius: var(--border-radius);
-            padding: 10px; 
-            margin-top: auto;
-            text-align: left;
-        }
-
-        .inner-info-box details { margin: 0; border: none; background: transparent; }
-        .inner-info-box summary {
-            padding: 0; font-size: 0.8rem; font-weight: 600; color: var(--brand-primary);
-            display: flex; justify-content: space-between; align-items: center; border: none;
-        }
-        .inner-info-box details[open] summary { border-bottom: 1px solid #dee2e6; margin-bottom: 5px; padding-bottom: 5px; color: var(--brand-dark); }
-        
-        .inner-content-title { font-weight: 700; font-size: 0.8rem; color: var(--text-main); margin-bottom: 3px; display: block; }
-        .inner-content-text { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; }
-
-        details { margin: 10px auto; background: #ffffff; border: 1px solid var(--info-border); border-radius: var(--border-radius); text-align: left; max-width: 700px; width: 100%; background-color: var(--info-bg); }
-        summary { padding: 12px; cursor: pointer; font-weight: 700; color: var(--brand-dark); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; list-style: none; user-select: none; }
-        summary::after { content: '+'; color: var(--brand-primary); font-weight: 400; font-size: 1.2rem; }
-        details[open] summary { border-bottom: 1px solid var(--info-border); }
-        details[open] summary::after { content: '−'; }
-        
-        details.locked summary { pointer-events: none; cursor: default; }
-        details.locked summary::after { display: none; } 
-
-        .info-content { padding: 12px; font-size: 0.85rem; color: var(--text-main); line-height: 1.5; background-color: white; border-bottom-left-radius: var(--border-radius); border-bottom-right-radius: var(--border-radius); }
-        .info-content ul { padding-left: 20px; margin: 5px 0; }
-        .info-content li { margin-bottom: 3px; }
-
-        .airport-lookup {
-            background-color: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--border-radius);
-            padding: 20px; margin: 15px auto; max-width: 500px; text-align: center;
-        }
-        .lookup-controls { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
-        .lookup-input { padding: 10px 12px; border: 1px solid #9aa5b1; border-radius: var(--border-radius); font-size: 0.95rem; flex-grow: 1; text-align: center; }
-        .lookup-btn { background-color: var(--brand-dark); color: white; border: none; padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; font-size: 0.95rem; }
-
-        .lookup-result { margin-top: 15px; font-size: 0.95rem; padding: 10px; border-radius: var(--border-radius); display: none; text-align: center; border-width: 1px; border-style: solid; }
-        .res-ok { background-color: var(--status-green); color: var(--status-green-text); border-color: var(--status-green-border); }
-        .res-bad { background-color: var(--status-red); color: var(--status-red-text); border-color: #dc3545; }
-        .res-warn { background-color: #fff9db; color: #856404; border-color: #ffc107; }
-
-        .actions-container { margin-top: 25px; padding-top: 5px; width: 100%; display: flex; justify-content: center; clear: both; }
-        .actions { display: flex; justify-content: center; gap: 15px; margin-top: 15px; width: 100%; }
-        
-        button.action-btn { 
-            border: none; 
-            padding: 12px 30px; 
-            border-radius: var(--border-radius); 
-            font-size: 1rem; 
-            font-weight: 700; 
-            cursor: pointer; 
-            color: white; 
-            min-width: 120px; 
-            transition: all 0.2s; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        button.action-btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        
-        .btn-yes { background-color: var(--brand-primary); } 
-        .btn-no { background-color: #6c757d; } 
-        
-        .btn-neutral { background-color: #6c757d; color: white; border: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .btn-continue { 
-            background-color: var(--brand-primary); 
-            color: white; 
-            width: 100%; 
-            max-width: 100%; 
-            padding: 14px; 
-            border: none; 
-            border-radius: var(--border-radius); 
-            font-weight: 800; 
-            font-size: 1rem; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            display: block; 
-            margin: 0 auto; 
-            transition: background-color 0.2s;
-        }
-        .btn-continue:hover { background-color: var(--brand-hover); }
-        .btn-continue:disabled { background-color: #bdc3c7; cursor: not-allowed; }
-
-        .btn-back { 
-            align-self: flex-start; 
-            display: flex; 
-            align-items: center; 
-            gap: 6px; 
-            
-            background-color: #6c757d; 
-            color: white; 
-            
-            border: none; 
-            padding: 8px 16px; 
-            border-radius: var(--border-radius); 
-            font-size: 0.85rem; 
-            font-weight: 700; 
-            cursor: pointer; 
-            margin-bottom: 15px; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-            transition: all 0.2s;
-        }
-        .btn-back:hover { 
-            background-color: #5a6268;
-            transform: translateY(-2px);
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-main);
+            box-shadow: var(--shadow-card);
         }
         
-        .btn-restart-inner { position: relative; display: block; margin-top: 20px; margin-left: auto; background-color: var(--brand-primary); color: white; padding: 10px 20px; border-radius: var(--border-radius); border: none; font-weight: 700; cursor: pointer; font-size: 0.9rem; width: fit-content; text-transform: uppercase; }
+        .flowchart-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .slide-in { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        /* --- RESTEN AV STILEN FRA FORRIGE VERSJON (VEILEDER) --- */
+        h2.question-title { margin-top: 0; font-size: 1.5rem; color: var(--caa-blue); margin-bottom: 10px; }
+        .subtext { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
 
-        @media (max-width: 600px) { .selection-grid { grid-template-columns: 1fr; } .actions { flex-direction: column; } }
+        .btn { display: inline-block; padding: 12px 24px; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s, transform 0.1s; text-decoration: none; }
+        .btn:active { transform: translateY(1px); }
+        .btn-primary { background-color: var(--caa-blue-light); color: white; }
+        .btn-primary:hover { background-color: #004494; }
+        .btn-primary:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .btn-secondary { background-color: #6c757d; color: white; }
+        .btn-secondary:hover { background-color: #5a6268; }
+        .btn-outline { background: transparent; border: 1px solid #ced4da; color: var(--text-main); }
+        .btn-outline:hover { background: #f8f9fa; border-color: #adb5bd; }
+
+        .btn-back { margin-bottom: 20px; background: none; border: none; color: var(--text-muted); font-size: 0.9rem; padding: 0; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .btn-back:hover { color: var(--caa-blue-light); text-decoration: underline; }
+
+        .selection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .selection-option { background: #fff; border: 2px solid #e9ecef; border-radius: var(--radius-main); padding: 20px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .selection-option:hover { border-color: #beccd6; transform: translateY(-2px); }
+        .selection-option.selected { border-color: var(--caa-blue-light); background-color: #f0f7ff; box-shadow: 0 0 0 1px var(--caa-blue-light) inset; }
+        .sel-icon { width: 40px; height: 40px; margin-bottom: 15px; color: var(--caa-blue); }
+        .sel-icon svg { width: 100%; height: 100%; fill: currentColor; }
+        .sel-label { font-weight: 700; color: var(--caa-blue); margin-bottom: 5px; display: block; }
+
+        details { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
+        summary { padding: 12px 15px; font-weight: 600; cursor: pointer; color: var(--caa-blue); outline: none; }
+        summary:hover { background-color: #eef2f5; }
+        .info-content { padding: 15px; border-top: 1px solid #e9ecef; font-size: 0.95rem; line-height: 1.6; background: #fff; }
+        .info-content ul { padding-left: 20px; margin: 0; }
+        .info-content li { margin-bottom: 5px; }
+
+        .airport-lookup-wrapper { background: #eef2f5; padding: 25px; border-radius: var(--radius-main); text-align: center; margin-bottom: 25px; }
+        .lookup-input-group { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .lookup-input { padding: 10px 15px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1rem; width: 200px; }
+        .lookup-result { margin-top: 15px; padding: 15px; border-radius: 4px; text-align: left; display: none; border: 1px solid transparent; }
+        .res-ok { background: var(--status-success); color: var(--status-success-text); border-color: #c3e6cb; }
+        .res-bad { background: var(--status-danger); color: var(--status-danger-text); border-color: #f5c6cb; }
+        .res-warn { background: var(--status-warning); color: var(--status-warning-text); border-color: #ffeeba; }
+
+        .action-bar { display: flex; gap: 15px; margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .action-bar-center { justify-content: center; }
+        
+        .result-box { text-align: center; padding: 20px 0; }
+        .result-icon { width: 64px; height: 64px; margin: 0 auto 20px auto; display: block; }
+        .result-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--caa-blue); }
+        .result-desc { font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto 30px auto; }
+        
+        .disclaimer { background-color: #e2e6ea; color: #383d41; padding: 15px; border-radius: 4px; font-size: 0.9rem; margin-top: 20px; border-left: 4px solid var(--caa-blue); }
+
+        .inner-details { font-size: 0.85rem; margin-top: 10px; color: #555; text-align: left; width: 100%; }
+        .inner-details summary { font-size: 0.8rem; padding: 5px 0; color: var(--caa-blue-light); }
+        .inner-details .info-content { padding: 10px; border: 1px solid #eee; background: #fafafa; }
+
+        @media (max-width: 600px) {
+            .app-card { padding: 20px; }
+            .action-bar { flex-direction: column; }
+            .btn { width: 100%; }
+            .lookup-input-group { flex-direction: column; }
+            .lookup-input { width: 100%; }
+            header h1 { font-size: 0.9rem; }
+            .logo { height: 30px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="header-bar"></div>
+    <header>
+        <div class="header-content">
+            <img src="https://luftfartstilsynet.no/globalassets/design/logo/lt-logo-hvit.svg" alt="Luftfartstilsynet Logo" class="logo">
+            <h1>Veileder (EU) 2025/20<br>Ground Handling</h1>
+        </div>
+    </header>
 
-    <div class="flow-wrapper">
-        <div class="flow-line"></div>
-        <div id="flow-container"></div>
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('flowchart')">Flytskjema</button>
+            <button class="tab-btn" onclick="switchTab('interactive')">Interaktiv veileder</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        
+        <div id="view-flowchart" class="tab-content active">
+            <div class="flowchart-wrapper">
+                <h2 class="question-title">Oversikt over prosessen</h2>
+                <p class="subtext">Klikk på bildet for å se større versjon, eller bruk den interaktive veilederen i neste fane.</p>
+                <img src="Bakketjenester - flytskjema - engelske begreper.png" alt="Flytskjema for Ground Handling" class="flowchart-img">
+            </div>
+        </div>
+
+        <div id="view-interactive" class="tab-content">
+            <div id="app-card" class="app-card">
+                </div>
+        </div>
+
     </div>
 
 <script>
+    // --- TAB SWITCHING LOGIC ---
+    function switchTab(tabId) {
+        // Hide all content
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        // Deactivate all buttons
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+        // Show selected content
+        document.getElementById('view-' + tabId).classList.add('active');
+        // Activate button - find button that calls this function with specific ID
+        const buttons = document.querySelectorAll('.tab-btn');
+        if(tabId === 'flowchart') buttons[0].classList.add('active');
+        if(tabId === 'interactive') buttons[1].classList.add('active');
+    }
+
+
+    // --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER) --- 
+
     const airportDB = {
         "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
         "ENBR": { name: "Bergen lufthavn, Flesland", easa: true },
@@ -469,7 +371,7 @@
                         </ul>
                         <p>Disse lufthavnene skal ha et EASA-sertifikat i henhold til forordning (EU) 139/2014.</p>
 
-                        <a href="https://www.easa.europa.eu/en/datasets/aerodromes-falling-scope-regulation-eu-20181139" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">Se fullstendig liste her (EASA)</a>`
+                        <a href="https://www.easa.europa.eu/en/datasets/aerodromes-falling-scope-regulation-eu-20181139" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">Se fullstendig liste her (EASA)</a>`
                 }
             ],
             lookupWidget: true, 
@@ -542,11 +444,11 @@
                     title: "Liste over unntatte tjenester", alwaysOpen: true, 
                     content: `
                     <ul>
-                        <li>Marshalling, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-aerodromes-regulation-eu-no-1392014" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 139/2014</a></li>
-                        <li>Flight dispatch, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-air-operations-regulation-eu-no-9652012" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 965/2012</a></li>
+                        <li>Marshalling, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-aerodromes-regulation-eu-no-1392014" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 139/2014</a></li>
+                        <li>Flight dispatch, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-air-operations-regulation-eu-no-9652012" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 965/2012</a></li>
                         <li>Load control (herunder lasteplan, vekt og balanse, meldinger/kommunikasjon, utstedelse av dokumenter)</li>
                         <li>Ground supervision</li>
-                        <li>Vedlikeholdsarbeid iht. <a href="https://www.easa.europa.eu/en/document-library/regulations/commission-regulation-eu-no-13212014" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 1321/2014</a>
+                        <li>Vedlikeholdsarbeid iht. <a href="https://www.easa.europa.eu/en/document-library/regulations/commission-regulation-eu-no-13212014" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 1321/2014</a>
                             <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
                                 <li>Oljeservice</li>
                                 <li>Ekstern vask av flymaskin</li>
@@ -591,8 +493,8 @@
         }
     };
 
-    const container = document.getElementById('flow-container');
-    let historyStack = [];
+    const container = document.getElementById('app-card');
+    let historyStack = []; 
 
     function init() { renderStartPage(); }
 
@@ -600,116 +502,116 @@
         historyStack = [];
         userSelectedNonEasa = false;
         isHelicopterCase = false;
-        container.innerHTML = '';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        init();
+        renderStartPage();
     }
 
+    // Render Start Page
     function renderStartPage() {
-        const div = document.createElement('div');
-        div.className = 'step-card step-active slide-in';
-        div.innerHTML = `
-            <div class="question-text">Er virksomheten min omfattet av regelverket?</div>
-            <div class="intro-text">
-                <p>Denne veilederen hjelper deg å avklare om din organisasjon må levere samsvarserklæring for ground handling i henhold til forordning (EU) 2025/20.</p>
-                <p>Ved å svare på noen spørsmål om din virksomhet, vil du få en indikasjon på om dine tjenester faller inn under kravet til deklarering.</p>
+        container.innerHTML = `
+            <div style="text-align:center;">
+                <h2 class="question-title">Er virksomheten min omfattet av regelverket?</h2>
+                <div class="subtext">
+                    <p>Denne veilederen hjelper deg å avklare om din organisasjon må levere samsvarserklæring for ground handling i henhold til forordning (EU) 2025/20.</p>
+                </div>
+                
+                <div class="disclaimer">
+                    <strong>Viktig informasjon:</strong>
+                    Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å sette seg inn i og følge gjeldende regelverk.
+                    <br><br>
+                    Ved behov for avklaring, ta kontakt med Luftfartstilsynet på: <a href="mailto:postmottak@caa.no" style="color:var(--caa-blue-light);">postmottak@caa.no</a>
+                </div>
+
+                <div class="action-bar action-bar-center">
+                    <button class="btn btn-primary" onclick="startFlow()">Start sjekken</button>
+                </div>
             </div>
-            <div class="disclaimer-box">
-                <strong>Viktig informasjon:</strong>
-                Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å sette seg inn i og følge gjeldende regelverk.
-                <br><br>
-                Ved behov for avklaring, ta kontakt med Luftfartstilsynet på:
-                <br><a href="mailto:postmottak@caa.no">postmottak@caa.no</a>
-            </div>
-            <button class="btn-continue" onclick="startFlow()">Start sjekken</button>
         `;
-        container.innerHTML = '';
-        container.appendChild(div);
     }
 
-    function startFlow() { container.innerHTML = ''; renderStep(0); }
+    function startFlow() { renderStep(0); }
 
-    function renderStep(stepId) {
-        if (historyStack.length > 0) {
-            const last = document.getElementById(historyStack[historyStack.length - 1].elementId);
-            if(last) last.classList.replace('step-active', 'step-dimmed');
+    function goBack() {
+        if(historyStack.length > 0) {
+            const prevStepId = historyStack.pop();
+            renderStep(prevStepId, false); 
+        } else {
+            renderStartPage();
         }
-        const data = steps[stepId];
-        const elementId = `step-${stepId}-${Date.now()}`;
-        const stepDiv = document.createElement('div');
-        stepDiv.className = 'step-card step-active slide-in';
-        stepDiv.id = elementId;
-        historyStack.push({ stepId, elementId });
+    }
 
-        let html = (stepId !== 0) ? `<button class="btn-back" onclick="goBack()">← Gå tilbake</button>` : '';
-        html += `<div class="question-text">${data.question}</div>`;
-        if(data.subtext) html += `<div class="subtext">${data.subtext}</div>`;
+    function renderStep(stepId, pushToHistory = true) {
+        const data = steps[stepId];
+        
+        let html = `
+            ${stepId > 0 ? `<button class="btn-back" onclick="goBack()">← Tilbake</button>` : ''}
+            <h2 class="question-title">${data.question}</h2>
+            ${data.subtext ? `<div class="subtext">${data.subtext}</div>` : ''}
+        `;
 
         if (data.lookupWidget) {
-            html += `<div class="airport-lookup">
-                <span style="font-size:0.95rem; font-weight:600; color:var(--brand-dark); display:block; margin-bottom:10px;">Søk på navn eller ICAO-kode:</span>
-                <div class="lookup-controls">
-                    <input type="text" id="icao-input-${elementId}" class="lookup-input" placeholder="Eks. ENGM" onfocus="this.value=''" onkeypress="if(event.key === 'Enter') checkAirport('${elementId}')">
-                    <button class="lookup-btn" onclick="checkAirport('${elementId}')">Sjekk</button>
+            html += `
+            <div class="airport-lookup-wrapper">
+                <label style="font-weight:600; display:block;">Søk på navn eller ICAO-kode:</label>
+                <div class="lookup-input-group">
+                    <input type="text" id="icao-input" class="lookup-input" placeholder="Eks. ENGM" onkeypress="if(event.key === 'Enter') checkAirport()">
+                    <button class="btn btn-primary" onclick="checkAirport()">Sjekk</button>
                 </div>
-                <div id="lookup-result-${elementId}" class="lookup-result"></div>
-                <div id="lookup-action-${elementId}" style="margin-top:15px; display:none;"></div>
-            </div>`;
+                <div id="lookup-result" class="lookup-result"></div>
+            </div>
+            `;
         }
-        
+
         if (data.details) {
             data.details.forEach(d => {
-                html += `<details ${d.alwaysOpen ? 'open class="locked"' : ''}><summary>${d.title}</summary><div class="info-content">${d.content}</div></details>`;
+                html += `<details ${d.alwaysOpen ? 'open' : ''}><summary>${d.title}</summary><div class="info-content">${d.content}</div></details>`;
             });
         }
 
+        html += `<div class="action-bar ${data.type !== 'selection' ? 'action-bar-center' : ''}" id="action-area" style="${data.type === 'selection' ? 'flex-direction:column; border:none; padding:0;' : ''}">`;
+
         if (data.type === 'selection') {
             const choices = data.choices.map(c => `
-                <div class="selection-card" id="choice-${c.id}" onclick="selectCategory('${elementId}', '${c.id}')">
+                <div class="selection-option" id="choice-${c.id}" onclick="selectOption('${c.id}')">
                     ${c.icon ? `<div class="sel-icon">${c.icon}</div>` : ''}
                     <span class="sel-label">${c.label}</span>
-                    <div class="inner-info-box">
-                        <details onclick="event.stopPropagation()">
-                            <summary><span>Les mer</span></summary>
-                            <div class="inner-content-wrapper" style="margin-top:10px;">
-                                <span class="inner-content-title">${c.innerTitle}</span>
-                                <div class="inner-content-text">${c.innerDesc}</div>
+                    <div class="inner-details">
+                         <details onclick="event.stopPropagation()">
+                            <summary>Les mer</summary>
+                            <div class="info-content">
+                                <strong>${c.innerTitle}</strong><br>
+                                ${c.innerDesc}
                             </div>
                         </details>
                     </div>
                 </div>`).join('');
             
-            html += `<div class="selection-grid ${(stepId === 1 || stepId === 2) ? 'selection-grid-vertical' : ''}">${choices}</div>
-                     <div class="actions-container" id="action-area-${elementId}" style="flex-direction: column; align-items: center; gap: 10px;">
-                        <button class="btn-continue" id="btn-cont-${elementId}" disabled onclick="handleResponse(${stepId}, 'continue', '${elementId}')">Fortsett</button>
-                        <button class="btn-neutral" style="width:100%; max-width:250px; padding:12px; border-radius:4px; font-weight:700; font-size:0.9rem; margin-top:5px; cursor:pointer;" onclick="handleResponse(${stepId}, 'none', '${elementId}')">Ingen av disse</button>
-                     </div>`;
+            html += `
+                <div class="selection-grid">${choices}</div>
+                <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
+                     <button class="btn btn-primary" id="btn-cont" disabled onclick="handleResponse(${stepId}, 'continue')">Fortsett</button>
+                     <button class="btn btn-outline" onclick="handleResponse(${stepId}, 'none')">Ingen av disse</button>
+                </div>
+            `;
         } else {
-            html += `<div class="actions-container actions" id="action-area-${elementId}">
-                        <button class="action-btn btn-yes" onclick="handleResponse(${stepId}, true, '${elementId}')">Ja</button>
-                        <button class="action-btn btn-no" onclick="handleResponse(${stepId}, false, '${elementId}')">Nei</button>
-                     </div>`;
+            const style = data.lookupWidget ? 'display:none;' : '';
+            html += `
+                <button class="btn btn-primary" id="btn-yes" style="${style}" onclick="handleResponse(${stepId}, true)">Ja</button>
+                <button class="btn btn-secondary" id="btn-no" style="${style}" onclick="handleResponse(${stepId}, false)">Nei</button>
+            `;
         }
-        
-        stepDiv.innerHTML = html;
-        container.appendChild(stepDiv);
-        
-        // SCROLL FIX: Scroll til toppen av containeren i stedet for kortet
-        // Dette sikrer at brukeren ser toppen av det nye kortet siden de nå ligger oppå hverandre
-        setTimeout(() => {
-            document.querySelector('.flow-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+
+        html += `</div>`; 
+
+        container.innerHTML = html;
+        window.scrollTo(0,0);
     }
 
-    function checkAirport(elementId) {
-        let input = document.getElementById(`icao-input-${elementId}`).value.trim().toUpperCase();
-        const resBox = document.getElementById(`lookup-result-${elementId}`);
-        const actionBox = document.getElementById(`lookup-action-${elementId}`);
-        const mainActions = document.getElementById(`action-area-${elementId}`);
+    function checkAirport() {
+        let input = document.getElementById(`icao-input`).value.trim().toUpperCase();
+        const resBox = document.getElementById(`lookup-result`);
+        const btnYes = document.getElementById('btn-yes');
         
         resBox.style.display = "block";
-        actionBox.style.display = "none";
-        mainActions.style.display = "flex";
         
         let found = airportDB[input];
 
@@ -732,93 +634,86 @@
                 isHelicopterCase = true;
                 resBox.className = "lookup-result res-warn";
                 resBox.innerHTML = `<strong>${found.name} (${input})</strong><br>Helikopteroperasjoner er unntatt.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
-                actionBox.style.display = "block";
-                actionBox.innerHTML = `<button class="btn-continue" style="background-color:var(--brand-primary);" onclick="handleResponse(0, true, '${elementId}')">Fortsett veilederen likevel</button>`;
-                mainActions.style.display = "none";
+                btnYes.style.display = 'inline-block';
+                btnYes.innerText = "Fortsett veilederen likevel";
+                
             } else if (!found.easa) {
                 userSelectedNonEasa = true;
                 isHelicopterCase = false;
                 resBox.className = "lookup-result res-bad";
                 resBox.innerHTML = `<strong>${found.name} (${input})</strong> er IKKE en EASA-lufthavn.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
-                actionBox.style.display = "block";
-                actionBox.innerHTML = `<button class="btn-continue" style="background-color:var(--brand-primary);" onclick="handleResponse(0, true, '${elementId}')">Fortsett veilederen likevel</button>`;
-                mainActions.style.display = "none";
+                btnYes.style.display = 'inline-block';
+                btnYes.innerText = "Fortsett veilederen likevel";
+
             } else {
                 userSelectedNonEasa = false;
                 isHelicopterCase = false;
                 resBox.className = "lookup-result res-ok";
                 resBox.innerHTML = `<strong>${found.name} (${input})</strong> er en EASA-lufthavn.`;
+                btnYes.style.display = 'inline-block';
+                btnYes.innerText = "Ja, gå videre";
             }
         } else {
             resBox.className = "lookup-result res-warn";
-            resBox.innerHTML = "Fant ingen treff.";
+            resBox.innerHTML = "Fant ingen treff i listen over norske EASA-lufthavner.";
+            btnYes.style.display = 'none';
         }
     }
 
-    function selectCategory(elementId, choiceId) {
-        const wrapper = document.getElementById(elementId);
-        wrapper.querySelectorAll('.selection-card').forEach(c => c.classList.remove('selected'));
-        wrapper.querySelector(`#choice-${choiceId}`).classList.add('selected');
-        document.getElementById(`btn-cont-${elementId}`).disabled = false;
+    function selectOption(id) {
+        document.querySelectorAll('.selection-option').forEach(el => el.classList.remove('selected'));
+        document.getElementById('choice-'+id).classList.add('selected');
+        document.getElementById('btn-cont').disabled = false;
     }
 
-    function handleResponse(stepId, answer, elementId) {
-        let next = steps[stepId].type === 'selection' ? (answer === 'none' ? steps[stepId].none : steps[stepId].next) : (answer ? steps[stepId].yes : steps[stepId].no);
-        if (userSelectedNonEasa && typeof next !== 'number') {
-            next = isHelicopterCase ? "result_helicopter" : "result_none";
+    function handleResponse(currentStepId, answer) {
+        historyStack.push(currentStepId);
+
+        let next = steps[currentStepId].type === 'selection' ? (answer === 'none' ? steps[currentStepId].none : steps[currentStepId].next) : (answer ? steps[currentStepId].yes : steps[currentStepId].no);
+        
+        if (typeof next !== 'number' && userSelectedNonEasa) {
+             next = isHelicopterCase ? "result_helicopter" : "result_none";
         }
-        setTimeout(() => { if (typeof next === 'number') renderStep(next); else renderResult(next); }, 400);
+
+        if (typeof next === 'number') {
+            renderStep(next, false); 
+        } else {
+            renderResult(next);
+        }
     }
 
     function renderResult(key) {
-        if (historyStack.length > 0) {
-            const last = document.getElementById(historyStack[historyStack.length - 1].elementId);
-            if(last) last.classList.replace('step-active', 'step-dimmed');
-        }
         const res = results[key];
-        const resDiv = document.createElement('div');
-        resDiv.className = `step-card step-active result-card-highlight slide-in`;
-        
-        let borderColor, iconColor, iconSvg;
-        const bg = "#ffffff"; 
-        const textColor = "var(--brand-dark)"; 
+        let iconColor = "";
+        let svgIcon = "";
 
         if (key === "result_declare") {
-            borderColor = "var(--status-green-border)";
-            iconColor = "var(--status-green-text)";
-            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+            iconColor = "var(--status-success-text)";
+            svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
         } else if (key === "result_helicopter") {
-            borderColor = "#ffc107"; 
-            iconColor = "#d39e00"; 
-            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+            iconColor = "var(--status-warning-text)";
+            svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
         } else {
-            borderColor = "#dc3545"; 
-            iconColor = "#dc3545";
-            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+            iconColor = "var(--status-danger-text)";
+            svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
         }
-        
-        resDiv.style.backgroundColor = bg;
-        resDiv.style.border = `1px solid var(--line-color)`;
-        resDiv.style.borderTop = `6px solid ${borderColor}`;
-        resDiv.style.padding = "30px";
 
-        resDiv.innerHTML = `${iconSvg}<h2 style="color:${textColor}; margin-top:0; font-size:1.4rem;">${res.title}</h2><p style="font-size:1rem; margin-bottom:20px;">${res.desc}</p><button class="btn-restart-inner" onclick="restartApp()">↺ Start på nytt</button>`;
-        container.appendChild(resDiv);
-        
-        setTimeout(() => {
-            document.querySelector('.flow-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
+        container.innerHTML = `
+            <div class="result-box">
+                <div class="result-icon">${svgIcon}</div>
+                <h2 class="result-title">${res.title}</h2>
+                <div class="result-desc">${res.desc}</div>
+                <div class="action-bar action-bar-center">
+                    <button class="btn btn-secondary" onclick="restartApp()">Start på nytt</button>
+                </div>
+            </div>
+        `;
+        window.scrollTo(0,0);
     }
 
-    function goBack() {
-        if (historyStack.length <= 1) return;
-        document.getElementById(historyStack.pop().elementId).remove();
-        const prev = historyStack.pop();
-        document.getElementById(prev.elementId).remove();
-        renderStep(prev.stepId);
-    }
-
+    // Start
     init();
+
 </script>
 </body>
 </html>
