@@ -4,28 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Veileder (EU) 2025/20 - Ground Handling</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stil.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-    <header>
-        <div class="header-left">
-            <img src="https://luftfartstilsynet.no/globalassets/design/logo/lt-logo-hvit.svg" alt="Luftfartstilsynet Logo" class="logo">
-            <span class="brand-name">CAA Norway</span>
-            <span class="separator">|</span>
-            <span class="tool-name">Veileder (EU) 2025/20</span>
-        </div>
-    </header>
-
-    <div class="main-container">
-        <div id="app-card" class="app-card">
+    <nav class="navbar">
+        <div class="navbar-wrapper">
+            <div class="nav-left">
+                <img src="logo.png" alt="CAA Norway" class="nav-logo">
             </div>
-    </div>
+            <div class="nav-center">
+                <h1 class="nav-title">Veileder (EU) 2025/20</h1>
+                <h2 class="nav-subtitle">Ground Handling & Bakketjenester</h2>
+            </div>
+            <div class="nav-right"></div>
+        </div>
+    </nav>
 
-    <script src="script.js"></script>
+    <main class="container">
+        
+        <div id="welcome-screen" class="question-card welcome-card">
+            <div class="welcome-icon">
+                <i class="fas fa-plane-arrival"></i>
+            </div>
+            
+            <h2>Er virksomheten omfattet av regelverket?</h2>
+            
+            <div class="welcome-text">
+                <p>Denne veilederen hjelper deg å avklare om din organisasjon må levere samsvarserklæring for ground handling i henhold til forordning (EU) 2025/20.</p>
+                <p>Ved å svare på noen spørsmål om din virksomhet, vil du få en indikasjon på om dine tjenester faller inn under kravet til deklarering.</p>
+                
+                <div class="info-box">
+                    <i class="fas fa-info-circle"></i>
+                    <span><strong>Viktig:</strong> Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å følge gjeldende regelverk.</span>
+                </div>
+            </div>
+
+            <button id="start-btn" class="btn-start">Start sjekken <i class="fas fa-arrow-right"></i></button>
+        </div>
+
+        <div id="question-card" class="question-card hidden">
+            
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="card-content">
+                <h3 id="question-title" class="question-header"></h3>
+                
+                <div id="question-text" class="question-description"></div>
+
+                <div id="lookup-container" class="lookup-wrapper hidden">
+                    <div class="lookup-inner">
+                        <input type="text" id="icao-input" placeholder="Søk flyplass (f.eks. ENGM eller Gardermoen)" autocomplete="off">
+                        <button id="lookup-btn" class="btn-lookup">Sjekk</button>
+                    </div>
+                    <div id="lookup-result" class="lookup-feedback hidden"></div>
+                </div>
+                
+                <div id="options-container" class="button-grid-main"></div>
+                
+                <div id="secondary-options-container" class="button-grid-secondary"></div>
+            </div>
+
+            <div id="result-area" class="hidden fade-in">
+                <div class="result-icon-wrapper" id="result-icon-container"></div>
+                <h2 class="result-header">Resultat</h2>
+                <div id="result-box" class="result-message"></div>
+                
+                <div id="result-summary" class="summary-box hidden"></div>
+
+                <div class="button-footer">
+                    <button onclick="location.reload()" class="btn-reset"><i class="fas fa-redo"></i> Start på nytt</button>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <button id="back-btn" class="btn-back hidden">
+                    <i class="fas fa-arrow-left"></i> Gå tilbake
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="logikk.js"></script>
 </body>
 </html>
