@@ -3,92 +3,822 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Veileder (EU) 2025/20 - Ground Handling</title>
-    <link rel="stylesheet" href="stil.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Veileder (EU) 2025/20</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- PROFIL OG VARIABLER --- */
+        :root {
+            /* Farger hentet fra referansebildet */
+            --brand-primary: #3FA9F5; /* Den klare blåfargen */
+            --brand-dark: #2c3e50;    /* Mørk tekstfarge */
+            --brand-hover: #2c8ac9;
+            
+            --bg-page: #ffffff;       /* Hvit bakgrunn som i bildet */
+            --card-bg: #ffffff;
+            
+            /* Info-boks farger fra bildet */
+            --info-bg: #eaf6ff;
+            --info-border: #9dcbf5;
+            --info-text: #2c3e50;
+
+            --text-main: #231f20;
+            --text-light: #595959;
+            
+            --status-green: #e3f9e5;
+            --status-green-text: #007c2e;
+            --status-green-border: #28a745;
+
+            --status-red: #ffe6e6;
+            --status-red-text: #ba160c;
+
+            --status-orange: #fff3cd; /* Lys oransje bakgrunn */
+            --status-orange-text: #d39e00; /* Oransje tekst */
+            --status-orange-border: #ffeeba; /* Oransje border */
+
+            
+            --line-color: #e6e6e6;
+            --border-radius: 4px; /* Litt skarpere hjørner iht. bildet */
+            
+            /* Flatere design (mindre skygge) */
+            --shadow-subtle: 0 1px 4px rgba(0, 0, 0, 0.05);
+            --shadow-active: 0 4px 20px rgba(63, 169, 245, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Open Sans', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: scroll;
+        }
+
+        .header-bar {
+            width: 100%;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--line-color);
+            height: 50px; 
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* ENDRET: Lagt til position relative for å styre absolutte barn */
+        .flow-wrapper {
+            width: 100%;
+            max-width: 750px; 
+            margin: 80px 15px 50px 15px; 
+            position: relative;
+            min-height: 400px; /* Sikrer at den ikke kollapser helt ved bytte */
+        }
+
+        .flow-line {
+            position: absolute;
+            top: 10px;
+            bottom: 20px;
+            left: 50%;
+            width: 2px;
+            background-color: #f0f0f0;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        /* ENDRET: step-card oppførsel */
+        .step-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px 30px; 
+            margin-bottom: 20px; 
+            /* Fjernet position: relative herfra for å styre det i active/dimmed */
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid var(--line-color);
+            box-shadow: var(--shadow-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; /* Sikrer full bredde */
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: -10px; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 10px;
+            background-color: #dbe1e6;
+            border-radius: 50%;
+            border: 3px solid var(--bg-page);
+            transition: background-color 0.4s;
+            z-index: 15;
+        }
+        
+        .step-card:first-child::before { display: none; }
+
+        /* ENDRET: Active ligger "i flyten" (relative) og øverst */
+        .step-active {
+            position: relative;
+            opacity: 1;
+            transform: translateY(0);
+            box-shadow: var(--shadow-active);
+            border-color: var(--brand-primary); 
+            z-index: 10;
+        }
+        
+        /* ENDRET: Dimmed legges absolute for å ikke ta plass, og skjules */
+        .step-dimmed {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            z-index: 0;
+            visibility: hidden; /* Skjuler den helt for interaksjon */
+        }
+
+        .result-card-highlight {
+            transform: scale(1.02) !important;
+            z-index: 20 !important;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1) !important;
+        }
+
+        .question-text {
+            font-size: 1.3rem; 
+            font-weight: 700;
+            color: var(--brand-dark);
+            margin-bottom: 10px;
+            line-height: 1.3;
+            max-width: 800px;
+        }
+        
+        .subtext { font-size: 0.95rem; margin-bottom: 15px; color: var(--text-light); }
+
+        .intro-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            text-align: center;
+            max-width: 700px;
+        }
+
+        /* --- BLÅ STIL --- */
+        .disclaimer-box {
+            background-color: var(--info-bg);
+            border: 1px solid var(--info-border);
+            border-left: 5px solid var(--brand-primary); 
+            padding: 15px 20px; 
+            margin: 15px auto;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--info-text);
+            max-width: 650px;
+            border-radius: var(--border-radius);
+        }
+        .disclaimer-box strong { 
+            display: block; 
+            margin-bottom: 5px; 
+            color: var(--brand-primary); 
+            font-size: 0.95rem;
+        }
+        .disclaimer-box a { color: var(--brand-primary); font-weight: 700; text-decoration: underline; }
+
+        /* KOMPAKT GRID */
+        .selection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 10px; 
+            margin: 15px 0 20px 0;
+            text-align: left;
+            width: 100%;
+            align-items: stretch;
+        }
+        
+        .selection-grid-vertical { 
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+        }
+
+        /* KOMPAKT KNAPPER/VALG */
+        .selection-card {
+            background: #f4f7fa; 
+            border: 2px solid #c5ced6; 
+            border-radius: var(--border-radius);
+            padding: 15px; 
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            height: 100%; 
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .selection-card:hover {
+            border-color: var(--brand-primary);
+            background-color: #ebf5ff; 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 16px rgba(63, 169, 245, 0.2);
+            z-index: 5;
+        }
+
+        .selection-card.selected {
+            border-color: var(--brand-primary);
+            background-color: var(--info-bg);
+            box-shadow: 0 0 0 2px var(--brand-primary) inset;
+            transform: translateY(-1px);
+        }
+
+        .sel-icon {
+            width: 28px; 
+            height: 28px;
+            margin: 0 auto 10px auto;
+            color: var(--brand-primary);
+            display: block;
+        }
+        .sel-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+        .sel-label {
+            font-weight: 700;
+            font-size: 0.95rem; 
+            color: var(--brand-dark);
+            margin-bottom: 8px;
+            display: block;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        .inner-info-box {
+            background: #ffffff; 
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+            padding: 10px; 
+            margin-top: auto;
+            text-align: left;
+        }
+
+        .inner-info-box details { margin: 0; border: none; background: transparent; }
+        .inner-info-box summary {
+            padding: 0; font-size: 0.8rem; font-weight: 600; color: var(--brand-primary);
+            display: flex; justify-content: space-between; align-items: center; border: none;
+        }
+        .inner-info-box details[open] summary { border-bottom: 1px solid #dee2e6; margin-bottom: 5px; padding-bottom: 5px; color: var(--brand-dark); }
+        
+        .inner-content-title { font-weight: 700; font-size: 0.8rem; color: var(--text-main); margin-bottom: 3px; display: block; }
+        .inner-content-text { font-size: 0.8rem; color: var(--text-light); line-height: 1.4; }
+
+        details { margin: 10px auto; background: #ffffff; border: 1px solid var(--info-border); border-radius: var(--border-radius); text-align: left; max-width: 700px; width: 100%; background-color: var(--info-bg); }
+        summary { padding: 12px; cursor: pointer; font-weight: 700; color: var(--brand-dark); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; list-style: none; user-select: none; }
+        summary::after { content: '+'; color: var(--brand-primary); font-weight: 400; font-size: 1.2rem; }
+        details[open] summary { border-bottom: 1px solid var(--info-border); }
+        details[open] summary::after { content: '−'; }
+        
+        details.locked summary { pointer-events: none; cursor: default; }
+        details.locked summary::after { display: none; } 
+
+        .info-content { padding: 12px; font-size: 0.85rem; color: var(--text-main); line-height: 1.5; background-color: white; border-bottom-left-radius: var(--border-radius); border-bottom-right-radius: var(--border-radius); }
+        .info-content ul { padding-left: 20px; margin: 5px 0; }
+        .info-content li { margin-bottom: 3px; }
+
+        .airport-lookup {
+            background-color: var(--info-bg); border: 1px solid var(--info-border); border-radius: var(--border-radius);
+            padding: 20px; margin: 15px auto; max-width: 500px; text-align: center;
+        }
+        .lookup-controls { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .lookup-input { padding: 10px 12px; border: 1px solid #9aa5b1; border-radius: var(--border-radius); font-size: 0.95rem; flex-grow: 1; text-align: center; }
+        .lookup-btn { background-color: var(--brand-dark); color: white; border: none; padding: 10px 20px; border-radius: var(--border-radius); cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+
+        .lookup-result { margin-top: 15px; font-size: 0.95rem; padding: 10px; border-radius: var(--border-radius); display: none; text-align: center; border-width: 1px; border-style: solid; }
+        .res-ok { background-color: var(--status-green); color: var(--status-green-text); border-color: var(--status-green-border); }
+        .res-bad { background-color: var(--status-red); color: var(--status-red-text); border-color: #dc3545; }
+        .res-warn { background-color: #fff9db; color: #856404; border-color: #ffc107; }
+
+        .actions-container { margin-top: 25px; padding-top: 5px; width: 100%; display: flex; justify-content: center; clear: both; }
+        .actions { display: flex; justify-content: center; gap: 15px; margin-top: 15px; width: 100%; }
+        
+        button.action-btn { 
+            border: none; 
+            padding: 12px 30px; 
+            border-radius: var(--border-radius); 
+            font-size: 1rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            color: white; 
+            min-width: 120px; 
+            transition: all 0.2s; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        button.action-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        
+        .btn-yes { background-color: var(--brand-primary); } 
+        .btn-no { background-color: #6c757d; } 
+        
+        .btn-neutral { background-color: #6c757d; color: white; border: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .btn-continue { 
+            background-color: var(--brand-primary); 
+            color: white; 
+            width: 100%; 
+            max-width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: var(--border-radius); 
+            font-weight: 800; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            display: block; 
+            margin: 0 auto; 
+            transition: background-color 0.2s;
+        }
+        .btn-continue:hover { background-color: var(--brand-hover); }
+        .btn-continue:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        .btn-back { 
+            align-self: flex-start; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px; 
+            
+            background-color: #6c757d; 
+            color: white; 
+            
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: var(--border-radius); 
+            font-size: 0.85rem; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-bottom: 15px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+        .btn-back:hover { 
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .btn-restart-inner { position: relative; display: block; margin-top: 20px; margin-left: auto; background-color: var(--brand-primary); color: white; padding: 10px 20px; border-radius: var(--border-radius); border: none; font-weight: 700; cursor: pointer; font-size: 0.9rem; width: fit-content; text-transform: uppercase; }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+        @media (max-width: 600px) { .selection-grid { grid-template-columns: 1fr; } .actions { flex-direction: column; } }
+    </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="navbar-wrapper">
-            <div class="nav-left">
-                <img src="logo.png" alt="CAA Norway" class="nav-logo">
-            </div>
-            <div class="nav-center">
-                <h1 class="nav-title">Veileder (EU) 2025/20</h1>
-                <h2 class="nav-subtitle">Ground Handling & Bakketjenester</h2>
-            </div>
-            <div class="nav-right"></div>
-        </div>
-    </nav>
+    <div class="header-bar"></div>
 
-    <main class="container">
-        
-        <div id="welcome-screen" class="question-card welcome-card">
-            <div class="welcome-icon">
-                <i class="fas fa-plane-arrival"></i>
-            </div>
-            
-            <h2>Er virksomheten omfattet av regelverket?</h2>
-            
-            <div class="welcome-text">
+    <div class="flow-wrapper">
+        <div class="flow-line"></div>
+        <div id="flow-container"></div>
+    </div>
+
+<script>
+    const airportDB = {
+        "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
+        "ENBR": { name: "Bergen lufthavn, Flesland", easa: true },
+        "ENVA": { name: "Trondheim lufthavn, Værnes", easa: true },
+        "ENZV": { name: "Stavanger lufthavn, Sola", easa: true },
+        "ENTC": { name: "Tromsø lufthavn, Langnes", easa: true },
+        "ENBL": { name: "Førde Lufthamn, Bringeland", easa: true },
+        "ENBO": { name: "Bodø lufthavn", easa: true },
+        "ENEV": { name: "Harstad/Narvik lufthavn, Evenes", easa: true },
+        "ENCN": { name: "Kristiansand lufthavn, Kjevik", easa: true },
+        "ENAL": { name: "Ålesund lufthavn, Vigra", easa: true },
+        "ENHD": { name: "Haugesund lufthavn, Karmøy", easa: true },
+        "ENML": { name: "Molde lufthavn, Årø", easa: true },
+        "ENKR": { name: "Kirkenes lufthavn, Høybuktmoen", easa: true },
+        "ENAT": { name: "Alta lufthavn", easa: true },
+        "ENBS": { name: "Båtsfjord lufthavn", easa: true },
+        "ENKB": { name: "Kristiansund lufthavn, Kvernberget", easa: true },
+        "ENSB": { name: "Svalbard lufthavn, Longyear", easa: true },
+        "ENSR": { name: "Sørkjosen lufthavn", easa: true },
+        "ENTO": { name: "Sandefjord lufthavn, Torp", easa: true },
+        "ENSO": { name: "Stord lufthavn", easa: true },
+        "ENSG": { name: "Sogndal lufthamn, Haukåsen", easa: true },
+        "ENSS": { name: "Vardø lufthavn, Svartnes", easa: true },
+        "ENLK": { name: "Leknes lufthavn", easa: true },
+        "ENMS": { name: "Mosjøen lufthavn, Kjærstad", easa: true },
+        "ENST": { name: "Sandnessjøen lufthavn, Stokka", easa: true },
+        "ENRY": { name: "Moss lufthavn, Rygge", easa: false },
+        "ENOL": { name: "Ørland lufthavn", easa: false },
+        "ENGK": { name: "Arendal lufthavn, Gullknapp", easa: false },
+        "ENAN": { name: "Andøya lufthavn", easa: true },
+        "ENHF": { name: "Hammerfest lufthavn", easa: true },
+        "ENHV": { name: "Honningsvåg lufthavn, Valan", easa: true },
+        "ENVD": { name: "Vadsø lufthavn", easa: true },
+        "ENRS": { name: "Røst lufthavn", easa: true },
+        "ENSH": { name: "Svolvær lufthavn", easa: true },
+        "ENRA": { name: "Mo i Rana lufthavn", easa: true },
+        "ENBN": { name: "Brønnøysund lufthavn", easa: true },
+        "ENNA": { name: "Lakselv lufthavn, Banak", easa: true },
+        "ENSD": { name: "Sandane lufthavn", easa: true },
+        "ENFL": { name: "Florø lufthavn", easa: true },
+        "ENOV": { name: "Hovden lufthavn, Ørsta/Volda", easa: true },
+        "ENRM": { name: "Rørvik lufthavn", easa: true },
+        "ENRO": { name: "Røros lufthavn", easa: true },
+        "ENNM": { name: "Namsos lufthavn", easa: true },
+        "ENMH": { name: "Mehamn lufthavn", easa: true },
+        "ENBV": { name: "Berlevåg lufthavn", easa: true },
+        "ENHK": { name: "Hasvik lufthavn", easa: true },
+        "ENSK": { name: "Stokmarknes lufthavn", easa: true },
+        "ENVR": { name: "Værøy Helikopterhavn, Tabbisodden", easa: true, isHelicopter: true },
+        "ENBH": { name: "Bergen Helikopterhavn, Haakonsvern", easa: true, isHelicopter: true },
+        "ENNO": { name: "Notodden lufthavn, Tuven", easa: false },
+        "ENDU": { name: "Bardufoss lufthavn", easa: false }
+    };
+
+    let userSelectedNonEasa = false;
+    let isHelicopterCase = false;
+
+    const steps = [
+        {
+            id: 0,
+            type: 'yesno',
+            question: "Er virksomheten etablert på en EASA-lufthavn?",
+            details: [
+                {
+                    title: "Hva er en EASA-lufthavn?",
+                    content: `
+                        <p><strong>Hva skiller en EASA-lufthavn fra en nasjonal lufthavn?</strong><br>
+                        Forordning (EU) 2025/20 og 2025/23 gjelder kun bakketjenester levert på EASA-lufthavner. For å vite om lufthavnen dere opererer på er omfattet, må dere se på hvilke kriterier lufthavnen oppfyller etter basisforordning (EU) 2018/1139.</p>
+
+                        <strong>1. Hva er en EASA-lufthavn? (Omfattet av regelverket)</strong>
+                        <p>En lufthavn faller inn under EASA-regelverket (basisforordning 2018/1139 art. 2) dersom den oppfyller alle følgende kriterier:</p>
+                        <ul>
+                            <li>Den er åpen for allmenn bruk.</li>
+                            <li>Den betjener næringsmessig lufttransport (kommersielle flyvninger).</li>
+                            <li>Den har en asfaltert instrumentrullebane på 800 meter eller mer, eller betjener utelukkende helikoptre med instrumentinnflyging.</li>
+                        </ul>
+                        <p>Disse lufthavnene skal ha et EASA-sertifikat i henhold til forordning (EU) 139/2014.</p>
+
+                        <a href="https://www.easa.europa.eu/en/datasets/aerodromes-falling-scope-regulation-eu-20181139" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">Se fullstendig liste her (EASA)</a>`
+                }
+            ],
+            lookupWidget: true, 
+            yes: 1,
+            no: "result_none"
+        },
+        {
+            id: 1,
+            type: 'selection',
+            question: "Type virksomhet",
+            subtext: "Velg kategorien som passer for din organisasjon.",
+            choices: [
+                { 
+                    id: 'ghsp', label: 'Selvstendig GHSP', innerTitle: 'Ground Handling Service Provider',
+                    innerDesc: "Tilbydere av bakketjenester på EASA-lufthavner, iht. basisforordning (EU) 2018/1139" 
+                },
+                { 
+                    id: 'adr', label: 'ADR - Lufthavnoperatør', innerTitle: 'Lufthavnsoperatør',
+                    innerDesc: "Lufthavnsoperatør som også er tilbyder av bakketjenester" 
+                },
+                { 
+                    id: 'aoc', label: 'AOC med self-handling', innerTitle: 'Air Operator Certificate',
+                    innerDesc: "CAT-operasjoner med komplekse, motordrevne fly med faste vinger" 
+                }
+            ],
+            next: 2, 
+            none: "result_none"
+        },
+        {
+            id: 2,
+            type: 'selection', 
+            question: "Type bakketjenester",
+            subtext: "Velg en av tjenestene dere tilbyr for å gå videre.",
+            choices: [
+                { 
+                    id: 'pax', label: 'Passenger Handling', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>',
+                    innerTitle: 'Tilbyder av bakketjenester innen håndtering av passasjerer:', 
+                    innerDesc: `<ul><li>PRM (Personer med redusert mobilitet)</li><li>Oppsyn med passasjerer under boarding og de-boarding.</li><li>Transport av passasjerer mellom terminal og flymaskin.</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (a)</em>`
+                },
+                { 
+                    id: 'bag', label: 'Baggage Handling', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-3V4c0-1.11-.89-2-2-2H9c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4h6v2H9V4zm11 15H4V8h16v11z"/></svg>',
+                    innerTitle: 'Tilbyder av bakketjenester innen håndtering av bagasje:', 
+                    innerDesc: `<ul><li>Sortering og stabling av bagasje</li><li>Transfer av bagasje</li><li>Transport og levering på transportbånd</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (b)</em>`
+                },
+                { 
+                    id: 'air', label: 'Aircraft Servicing', icon: '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>',
+                    innerTitle: 'Tilbyder av bakketjenester innen flyservice:', 
+                    innerDesc: `<ul><li>Operasjoner med bakkeutstyr på flyoppstillingsplass</li><li>Lasting og lossing av catering</li><li>Flytanking</li><li>Toalettservice</li><li>Vannservice</li><li>Utvendig rengjøring av flymaskin</li><li>De-icing og anti-icing</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (c)</em>`
+                },
+                { 
+                    id: 'turn', label: 'Turnaround Activities', icon: '<svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>',
+                    innerTitle: 'Tilbyder av bakketjenester innen turn-around:', 
+                    innerDesc: `<ul><li>Ankomsttjenster (FOD og sikring av flyvemaskin på flyoppstillingsplass)</li><li>Lasting og lossing av flymaskin, inkl. bagasje, frakt, catering og loading supervision</li><li>Avgangsprosedyrer</li><li>Push-back og tauing</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (d)</em>`
+                },
+                { 
+                    id: 'cargo', label: 'Cargo & Mail Handling', icon: '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1.1-1-2-2-2zm-1 18H5V9h14v11zm1-13H4V4h16v3z"/></svg>',
+                    innerTitle: 'Tilbyder av bakketjenester innen frakt og post:', 
+                    innerDesc: `<ul><li>Aksept av frakt; på vegne av flyoperatøren</li><li>Siste oppbygging/ stabling og lagring av frakt</li><li>Siste veiing og tagging av ULD/ container</li><li>"Final checks" før luftftransport</li><li>Bakketransport av frakt og post mellom område for "Final checks" og flymaskin</li></ul>`
+                }
+            ],
+            next: 3,
+            none: "result_none"
+        },
+        {
+            id: 3,
+            type: 'yesno',
+            question: "Er driften begrenset til ett eller flere av påfølgende punkter?",
+            details: [
+                { 
+                    title: "Liste over unntatte tjenester", alwaysOpen: true, 
+                    content: `
+                    <ul>
+                        <li>Marshalling, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-aerodromes-regulation-eu-no-1392014" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 139/2014</a></li>
+                        <li>Flight dispatch, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-air-operations-regulation-eu-no-9652012" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 965/2012</a></li>
+                        <li>Load control (herunder lasteplan, vekt og balanse, meldinger/kommunikasjon, utstedelse av dokumenter)</li>
+                        <li>Ground supervision</li>
+                        <li>Vedlikeholdsarbeid iht. <a href="https://www.easa.europa.eu/en/document-library/regulations/commission-regulation-eu-no-13212014" target="_blank" style="color:var(--brand-primary); text-decoration:underline;">(EU) 1321/2014</a>
+                            <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                                <li>Oljeservice</li>
+                                <li>Ekstern vask av flymaskin</li>
+                                <li>Annet vedlikeholdsarbeid, inkl. tauing av fly.</li>
+                            </ul>
+                        </li>
+                        <li>AOC self-handling
+                            <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                                <li>CAT-operasjoner med ikke-komplekse motordrevne fly</li>
+                                <li>Flyoperasjoner med komplekse eller annet-enn-komplekse motordrevne fly som ikke er CAT</li>
+                            </ul>
+                        </li>
+                        <li>Lufthavnsoperatører som utelukkende
+                            <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                                <li>Utfører PRM-tjeneste (personer med redusert mobilitet)</li>
+                                <li>Utfører bakketransport av passasjerer og flybesetning (typisk busstjeneste)</li>
+                            </ul>
+                        </li>
+                    </ul><div style="margin-top:20px; font-style:italic; color:#666; font-size:0.85rem;">Ref. (EU) 2025/20 - Artikkel 2 - (3)</div>` 
+                }
+            ],
+            yes: "result_none",
+            no: "result_declare"
+        }
+    ];
+
+    const results = {
+        "result_none": { 
+            title: "Ingen deklarering", 
+            desc: "Virksomheten er ikke omfattet av regelverket, og du trenger ikke å levere samsvarserklæring i henhold til (EU) 2025/20.<br><br><strong>Årsak:</strong> Tjenestene eller lufthavnen faller utenfor forordningens virkeområde.", 
+            type: "res-none" 
+        },
+        "result_declare": { 
+            title: "Krav om samsvarserklæring", 
+            desc: "Virksomheten din er omfattet av regelverket og du må levere samsvarserklæring.<br><br><strong>Årsak:</strong> Dere utfører regulerte bakketjenester på en EASA-lufthavn.<br><br>Portalen for mottak av erklæringer åpnes tidligst 27. mars 2027.", 
+            type: "res-action" 
+        },
+        "result_helicopter": {
+            title: "Ingen deklarering (Helikopter-operasjoner)",
+            desc: "Virksomheten er ikke omfattet av regelverket fordi helikopteroperasjoner er unntatt i henhold til forordning (EU) 2025/20.<br><br>Du trenger ikke å levere samsvarserklæring.",
+            type: "res-heli"
+        }
+    };
+
+    const container = document.getElementById('flow-container');
+    let historyStack = [];
+
+    function init() { renderStartPage(); }
+
+    function restartApp() {
+        historyStack = [];
+        userSelectedNonEasa = false;
+        isHelicopterCase = false;
+        container.innerHTML = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        init();
+    }
+
+    function renderStartPage() {
+        const div = document.createElement('div');
+        div.className = 'step-card step-active slide-in';
+        div.innerHTML = `
+            <div class="question-text">Er virksomheten min omfattet av regelverket?</div>
+            <div class="intro-text">
                 <p>Denne veilederen hjelper deg å avklare om din organisasjon må levere samsvarserklæring for ground handling i henhold til forordning (EU) 2025/20.</p>
                 <p>Ved å svare på noen spørsmål om din virksomhet, vil du få en indikasjon på om dine tjenester faller inn under kravet til deklarering.</p>
-                
-                <div class="info-box">
-                    <i class="fas fa-info-circle"></i>
-                    <span><strong>Viktig:</strong> Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å følge gjeldende regelverk.</span>
+            </div>
+            <div class="disclaimer-box">
+                <strong>Viktig informasjon:</strong>
+                Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å sette seg inn i og følge gjeldende regelverk.
+                <br><br>
+                Ved behov for avklaring, ta kontakt med Luftfartstilsynet på:
+                <br><a href="mailto:postmottak@caa.no">postmottak@caa.no</a>
+            </div>
+            <button class="btn-continue" onclick="startFlow()">Start sjekken</button>
+        `;
+        container.innerHTML = '';
+        container.appendChild(div);
+    }
+
+    function startFlow() { container.innerHTML = ''; renderStep(0); }
+
+    function renderStep(stepId) {
+        if (historyStack.length > 0) {
+            const last = document.getElementById(historyStack[historyStack.length - 1].elementId);
+            if(last) last.classList.replace('step-active', 'step-dimmed');
+        }
+        const data = steps[stepId];
+        const elementId = `step-${stepId}-${Date.now()}`;
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'step-card step-active slide-in';
+        stepDiv.id = elementId;
+        historyStack.push({ stepId, elementId });
+
+        let html = (stepId !== 0) ? `<button class="btn-back" onclick="goBack()">← Gå tilbake</button>` : '';
+        html += `<div class="question-text">${data.question}</div>`;
+        if(data.subtext) html += `<div class="subtext">${data.subtext}</div>`;
+
+        if (data.lookupWidget) {
+            html += `<div class="airport-lookup">
+                <span style="font-size:0.95rem; font-weight:600; color:var(--brand-dark); display:block; margin-bottom:10px;">Søk på navn eller ICAO-kode:</span>
+                <div class="lookup-controls">
+                    <input type="text" id="icao-input-${elementId}" class="lookup-input" placeholder="Eks. ENGM" onfocus="this.value=''" onkeypress="if(event.key === 'Enter') checkAirport('${elementId}')">
+                    <button class="lookup-btn" onclick="checkAirport('${elementId}')">Sjekk</button>
                 </div>
-            </div>
+                <div id="lookup-result-${elementId}" class="lookup-result"></div>
+                <div id="lookup-action-${elementId}" style="margin-top:15px; display:none;"></div>
+            </div>`;
+        }
+        
+        if (data.details) {
+            data.details.forEach(d => {
+                html += `<details ${d.alwaysOpen ? 'open class="locked"' : ''}><summary>${d.title}</summary><div class="info-content">${d.content}</div></details>`;
+            });
+        }
 
-            <button id="start-btn" class="btn-start">Start sjekken <i class="fas fa-arrow-right"></i></button>
-        </div>
-
-        <div id="question-card" class="question-card hidden">
-            
-            <div class="progress-bar-container">
-                <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
-            </div>
-
-            <div class="card-content">
-                <h3 id="question-title" class="question-header"></h3>
-                
-                <div id="question-text" class="question-description"></div>
-
-                <div id="lookup-container" class="lookup-wrapper hidden">
-                    <div class="lookup-inner">
-                        <input type="text" id="icao-input" placeholder="Søk flyplass (f.eks. ENGM eller Gardermoen)" autocomplete="off">
-                        <button id="lookup-btn" class="btn-lookup">Sjekk</button>
+        if (data.type === 'selection') {
+            const choices = data.choices.map(c => `
+                <div class="selection-card" id="choice-${c.id}" onclick="selectCategory('${elementId}', '${c.id}')">
+                    ${c.icon ? `<div class="sel-icon">${c.icon}</div>` : ''}
+                    <span class="sel-label">${c.label}</span>
+                    <div class="inner-info-box">
+                        <details onclick="event.stopPropagation()">
+                            <summary><span>Les mer</span></summary>
+                            <div class="inner-content-wrapper" style="margin-top:10px;">
+                                <span class="inner-content-title">${c.innerTitle}</span>
+                                <div class="inner-content-text">${c.innerDesc}</div>
+                            </div>
+                        </details>
                     </div>
-                    <div id="lookup-result" class="lookup-feedback hidden"></div>
-                </div>
-                
-                <div id="options-container" class="button-grid-main"></div>
-                
-                <div id="secondary-options-container" class="button-grid-secondary"></div>
-            </div>
+                </div>`).join('');
+            
+            html += `<div class="selection-grid ${(stepId === 1 || stepId === 2) ? 'selection-grid-vertical' : ''}">${choices}</div>
+                     <div class="actions-container" id="action-area-${elementId}" style="flex-direction: column; align-items: center; gap: 10px;">
+                        <button class="btn-continue" id="btn-cont-${elementId}" disabled onclick="handleResponse(${stepId}, 'continue', '${elementId}')">Fortsett</button>
+                        <button class="btn-neutral" style="width:100%; max-width:250px; padding:12px; border-radius:4px; font-weight:700; font-size:0.9rem; margin-top:5px; cursor:pointer;" onclick="handleResponse(${stepId}, 'none', '${elementId}')">Ingen av disse</button>
+                     </div>`;
+        } else {
+            html += `<div class="actions-container actions" id="action-area-${elementId}">
+                        <button class="action-btn btn-yes" onclick="handleResponse(${stepId}, true, '${elementId}')">Ja</button>
+                        <button class="action-btn btn-no" onclick="handleResponse(${stepId}, false, '${elementId}')">Nei</button>
+                     </div>`;
+        }
+        
+        stepDiv.innerHTML = html;
+        container.appendChild(stepDiv);
+        
+        // SCROLL FIX: Scroll til toppen av containeren i stedet for kortet
+        // Dette sikrer at brukeren ser toppen av det nye kortet siden de nå ligger oppå hverandre
+        setTimeout(() => {
+            document.querySelector('.flow-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
 
-            <div id="result-area" class="hidden fade-in">
-                <div class="result-icon-wrapper" id="result-icon-container"></div>
-                <h2 class="result-header">Resultat</h2>
-                <div id="result-box" class="result-message"></div>
-                
-                <div id="result-summary" class="summary-box hidden"></div>
+    function checkAirport(elementId) {
+        let input = document.getElementById(`icao-input-${elementId}`).value.trim().toUpperCase();
+        const resBox = document.getElementById(`lookup-result-${elementId}`);
+        const actionBox = document.getElementById(`lookup-action-${elementId}`);
+        const mainActions = document.getElementById(`action-area-${elementId}`);
+        
+        resBox.style.display = "block";
+        actionBox.style.display = "none";
+        mainActions.style.display = "flex";
+        
+        let found = airportDB[input];
 
-                <div class="button-footer">
-                    <button onclick="location.reload()" class="btn-reset"><i class="fas fa-redo"></i> Start på nytt</button>
-                </div>
-            </div>
+        if (!found) {
+            const searchStr = input.toLowerCase();
+            if (searchStr.length > 2) { 
+                for (const [code, data] of Object.entries(airportDB)) {
+                    if (data.name.toLowerCase().includes(searchStr)) {
+                        found = data;
+                        input = code; 
+                        break; 
+                    }
+                }
+            }
+        }
 
-            <div class="card-footer">
-                <button id="back-btn" class="btn-back hidden">
-                    <i class="fas fa-arrow-left"></i> Gå tilbake
-                </button>
-            </div>
-        </div>
+        if (found) {
+            if (found.isHelicopter) {
+                userSelectedNonEasa = true;
+                isHelicopterCase = true;
+                resBox.className = "lookup-result res-warn";
+                resBox.innerHTML = `<strong>${found.name} (${input})</strong><br>Helikopteroperasjoner er unntatt.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
+                actionBox.style.display = "block";
+                actionBox.innerHTML = `<button class="btn-continue" style="background-color:var(--brand-primary);" onclick="handleResponse(0, true, '${elementId}')">Fortsett veilederen likevel</button>`;
+                mainActions.style.display = "none";
+            } else if (!found.easa) {
+                userSelectedNonEasa = true;
+                isHelicopterCase = false;
+                resBox.className = "lookup-result res-bad";
+                resBox.innerHTML = `<strong>${found.name} (${input})</strong> er IKKE en EASA-lufthavn.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
+                actionBox.style.display = "block";
+                actionBox.innerHTML = `<button class="btn-continue" style="background-color:var(--brand-primary);" onclick="handleResponse(0, true, '${elementId}')">Fortsett veilederen likevel</button>`;
+                mainActions.style.display = "none";
+            } else {
+                userSelectedNonEasa = false;
+                isHelicopterCase = false;
+                resBox.className = "lookup-result res-ok";
+                resBox.innerHTML = `<strong>${found.name} (${input})</strong> er en EASA-lufthavn.`;
+            }
+        } else {
+            resBox.className = "lookup-result res-warn";
+            resBox.innerHTML = "Fant ingen treff.";
+        }
+    }
 
-    </main>
+    function selectCategory(elementId, choiceId) {
+        const wrapper = document.getElementById(elementId);
+        wrapper.querySelectorAll('.selection-card').forEach(c => c.classList.remove('selected'));
+        wrapper.querySelector(`#choice-${choiceId}`).classList.add('selected');
+        document.getElementById(`btn-cont-${elementId}`).disabled = false;
+    }
 
-    <script src="logikk.js"></script>
+    function handleResponse(stepId, answer, elementId) {
+        let next = steps[stepId].type === 'selection' ? (answer === 'none' ? steps[stepId].none : steps[stepId].next) : (answer ? steps[stepId].yes : steps[stepId].no);
+        if (userSelectedNonEasa && typeof next !== 'number') {
+            next = isHelicopterCase ? "result_helicopter" : "result_none";
+        }
+        setTimeout(() => { if (typeof next === 'number') renderStep(next); else renderResult(next); }, 400);
+    }
+
+    function renderResult(key) {
+        if (historyStack.length > 0) {
+            const last = document.getElementById(historyStack[historyStack.length - 1].elementId);
+            if(last) last.classList.replace('step-active', 'step-dimmed');
+        }
+        const res = results[key];
+        const resDiv = document.createElement('div');
+        resDiv.className = `step-card step-active result-card-highlight slide-in`;
+        
+        let borderColor, iconColor, iconSvg;
+        const bg = "#ffffff"; 
+        const textColor = "var(--brand-dark)"; 
+
+        if (key === "result_declare") {
+            borderColor = "var(--status-green-border)";
+            iconColor = "var(--status-green-text)";
+            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+        } else if (key === "result_helicopter") {
+            borderColor = "#ffc107"; 
+            iconColor = "#d39e00"; 
+            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+        } else {
+            borderColor = "#dc3545"; 
+            iconColor = "#dc3545";
+            iconSvg = `<svg style="width:50px; height:50px; fill:${iconColor}; margin-bottom:10px;" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>`;
+        }
+        
+        resDiv.style.backgroundColor = bg;
+        resDiv.style.border = `1px solid var(--line-color)`;
+        resDiv.style.borderTop = `6px solid ${borderColor}`;
+        resDiv.style.padding = "30px";
+
+        resDiv.innerHTML = `${iconSvg}<h2 style="color:${textColor}; margin-top:0; font-size:1.4rem;">${res.title}</h2><p style="font-size:1rem; margin-bottom:20px;">${res.desc}</p><button class="btn-restart-inner" onclick="restartApp()">↺ Start på nytt</button>`;
+        container.appendChild(resDiv);
+        
+        setTimeout(() => {
+            document.querySelector('.flow-wrapper').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    }
+
+    function goBack() {
+        if (historyStack.length <= 1) return;
+        document.getElementById(historyStack.pop().elementId).remove();
+        const prev = historyStack.pop();
+        document.getElementById(prev.elementId).remove();
+        renderStep(prev.stepId);
+    }
+
+    init();
+</script>
 </body>
 </html>

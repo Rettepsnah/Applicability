@@ -1,4 +1,21 @@
-/* --- DATA & KONFIGURASJON --- */
+// --- TAB SWITCHING LOGIC ---
+function switchTab(tabId) {
+    // Skjul alt innhold
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    // Deaktiver alle knapper
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+    // Vis valgt innhold
+    document.getElementById('view-' + tabId).classList.add('active');
+    
+    // Aktiver riktig knapp
+    const buttons = document.querySelectorAll('.tab-btn');
+    if(tabId === 'flowchart') buttons[0].classList.add('active');
+    if(tabId === 'interactive') buttons[1].classList.add('active');
+}
+
+
+// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER) --- 
 
 const airportDB = {
     "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
@@ -54,25 +71,34 @@ const airportDB = {
     "ENDU": { name: "Bardufoss lufthavn", easa: false }
 };
 
+let userSelectedNonEasa = false;
+let isHelicopterCase = false;
+
 const steps = [
     {
         id: 0,
-        type: 'lookup',
+        type: 'yesno',
         question: "Er virksomheten etablert på en EASA-lufthavn?",
-        subtext: "Forordning (EU) 2025/20 gjelder kun bakketjenester levert på EASA-sertifiserte lufthavner.",
         details: [
             {
                 title: "Hva er en EASA-lufthavn?",
                 content: `
-                    <p>En lufthavn faller inn under EASA-regelverket dersom den oppfyller alle følgende kriterier:</p>
+                    <p><strong>Hva skiller en EASA-lufthavn fra en nasjonal lufthavn?</strong><br>
+                    Forordning (EU) 2025/20 og 2025/23 gjelder kun bakketjenester levert på EASA-lufthavner. For å vite om lufthavnen dere opererer på er omfattet, må dere se på hvilke kriterier lufthavnen oppfyller etter basisforordning (EU) 2018/1139.</p>
+
+                    <strong>1. Hva er en EASA-lufthavn? (Omfattet av regelverket)</strong>
+                    <p>En lufthavn faller inn under EASA-regelverket (basisforordning 2018/1139 art. 2) dersom den oppfyller alle følgende kriterier:</p>
                     <ul>
                         <li>Den er åpen for allmenn bruk.</li>
                         <li>Den betjener næringsmessig lufttransport (kommersielle flyvninger).</li>
-                        <li>Den har en asfaltert instrumentrullebane på 800 meter eller mer.</li>
+                        <li>Den har en asfaltert instrumentrullebane på 800 meter eller mer, eller betjener utelukkende helikoptre med instrumentinnflyging.</li>
                     </ul>
-                `
+                    <p>Disse lufthavnene skal ha et EASA-sertifikat i henhold til forordning (EU) 139/2014.</p>
+
+                    <a href="https://www.easa.europa.eu/en/datasets/aerodromes-falling-scope-regulation-eu-20181139" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">Se fullstendig liste her (EASA)</a>`
             }
         ],
+        lookupWidget: true, 
         yes: 1,
         no: "result_none"
     },
@@ -83,19 +109,16 @@ const steps = [
         subtext: "Velg kategorien som passer for din organisasjon.",
         choices: [
             { 
-                id: 'ghsp', label: 'Selvstendig GHSP', 
-                icon: '<i class="fas fa-building"></i>',
-                innerDesc: "Tilbydere av bakketjenester på EASA-lufthavner, iht. basisforordning (EU) 2018/1139." 
+                id: 'ghsp', label: 'Selvstendig GHSP', innerTitle: 'Ground Handling Service Provider',
+                innerDesc: "Tilbydere av bakketjenester på EASA-lufthavner, iht. basisforordning (EU) 2018/1139" 
             },
             { 
-                id: 'adr', label: 'ADR - Lufthavnoperatør', 
-                icon: '<i class="fas fa-tower-control"></i>',
-                innerDesc: "Lufthavnsoperatør som også er tilbyder av bakketjenester." 
+                id: 'adr', label: 'ADR - Lufthavnoperatør', innerTitle: 'Lufthavnsoperatør',
+                innerDesc: "Lufthavnsoperatør som også er tilbyder av bakketjenester" 
             },
             { 
-                id: 'aoc', label: 'AOC med self-handling', 
-                icon: '<i class="fas fa-plane"></i>',
-                innerDesc: "CAT-operasjoner med komplekse, motordrevne fly med faste vinger." 
+                id: 'aoc', label: 'AOC med self-handling', innerTitle: 'Air Operator Certificate',
+                innerDesc: "CAT-operasjoner med komplekse, motordrevne fly med faste vinger" 
             }
         ],
         next: 2, 
@@ -105,13 +128,33 @@ const steps = [
         id: 2,
         type: 'selection', 
         question: "Type bakketjenester",
-        subtext: "Hvilken tjeneste tilbyr dere?",
+        subtext: "Velg en av tjenestene dere tilbyr for å gå videre.",
         choices: [
-            { id: 'pax', label: 'Passenger Handling', icon: '<i class="fas fa-user-friends"></i>', innerDesc: "Innsjekk, boarding, PRM, transport av passasjerer." },
-            { id: 'bag', label: 'Baggage Handling', icon: '<i class="fas fa-suitcase"></i>', innerDesc: "Sortering, stabling, transport til/fra fly." },
-            { id: 'air', label: 'Aircraft Servicing', icon: '<i class="fas fa-gas-pump"></i>', innerDesc: "Tanking, catering, toalettservice, de-icing." },
-            { id: 'turn', label: 'Turnaround Activities', icon: '<i class="fas fa-sync-alt"></i>', innerDesc: "Push-back, tauing, lasting/lossing, marshalling." },
-            { id: 'cargo', label: 'Cargo & Mail', icon: '<i class="fas fa-box-open"></i>', innerDesc: "Håndtering av frakt og post, lasting av ULD." }
+            { 
+                id: 'pax', label: 'Passenger Handling', icon: '<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>',
+                innerTitle: 'Tilbyder av bakketjenester innen håndtering av passasjerer:', 
+                innerDesc: `<ul><li>PRM (Personer med redusert mobilitet)</li><li>Oppsyn med passasjerer under boarding og de-boarding.</li><li>Transport av passasjerer mellom terminal og flymaskin.</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (a)</em>`
+            },
+            { 
+                id: 'bag', label: 'Baggage Handling', icon: '<svg viewBox="0 0 24 24"><path d="M20 6h-3V4c0-1.11-.89-2-2-2H9c-1.11 0-2 .89-2 2v2H4c-1.11 0-2 .89-2 2v11c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zM9 4h6v2H9V4zm11 15H4V8h16v11z"/></svg>',
+                innerTitle: 'Tilbyder av bakketjenester innen håndtering av bagasje:', 
+                innerDesc: `<ul><li>Sortering og stabling av bagasje</li><li>Transfer av bagasje</li><li>Transport og levering på transportbånd</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (b)</em>`
+            },
+            { 
+                id: 'air', label: 'Aircraft Servicing', icon: '<svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>',
+                innerTitle: 'Tilbyder av bakketjenester innen flyservice:', 
+                innerDesc: `<ul><li>Operasjoner med bakkeutstyr på flyoppstillingsplass</li><li>Lasting og lossing av catering</li><li>Flytanking</li><li>Toalettservice</li><li>Vannservice</li><li>Utvendig rengjøring av flymaskin</li><li>De-icing og anti-icing</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (c)</em>`
+            },
+            { 
+                id: 'turn', label: 'Turnaround Activities', icon: '<svg viewBox="0 0 24 24"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>',
+                innerTitle: 'Tilbyder av bakketjenester innen turn-around:', 
+                innerDesc: `<ul><li>Ankomsttjenster (FOD og sikring av flyvemaskin på flyoppstillingsplass)</li><li>Lasting og lossing av flymaskin, inkl. bagasje, frakt, catering og loading supervision</li><li>Avgangsprosedyrer</li><li>Push-back og tauing</li></ul><em>Ref. (EU) 2025/20 - Artikkel 2 - (d)</em>`
+            },
+            { 
+                id: 'cargo', label: 'Cargo & Mail Handling', icon: '<svg viewBox="0 0 24 24"><path d="M20 2H4c-1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1.1-1-2-2-2zm-1 18H5V9h14v11zm1-13H4V4h16v3z"/></svg>',
+                innerTitle: 'Tilbyder av bakketjenester innen frakt og post:', 
+                innerDesc: `<ul><li>Aksept av frakt; på vegne av flyoperatøren</li><li>Siste oppbygging/ stabling og lagring av frakt</li><li>Siste veiing og tagging av ULD/ container</li><li>"Final checks" før luftftransport</li><li>Bakketransport av frakt og post mellom område for "Final checks" og flymaskin</li></ul>`
+            }
         ],
         next: 3,
         none: "result_none"
@@ -119,18 +162,36 @@ const steps = [
     {
         id: 3,
         type: 'yesno',
-        question: "Er driften begrenset til unntatte tjenester?",
-        subtext: "Noen spesifikke operasjoner er unntatt fra kravet om samsvarserklæring.",
+        question: "Er driften begrenset til ett eller flere av påfølgende punkter?",
         details: [
             { 
-                title: "Se liste over unntak", 
+                title: "Liste over unntatte tjenester", alwaysOpen: true, 
                 content: `
                 <ul>
-                    <li>Marshalling, Flight dispatch, Load control, Ground supervision.</li>
-                    <li>Vedlikeholdsarbeid (oljeservice, ekstern vask, teknisk).</li>
-                    <li>AOC self-handling med ikke-komplekse fly.</li>
-                    <li>Lufthavnsoperatører som kun utfører PRM eller passasjertransport (buss).</li>
-                </ul>` 
+                    <li>Marshalling, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-aerodromes-regulation-eu-no-1392014" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 139/2014</a></li>
+                    <li>Flight dispatch, iht. <a href="https://www.easa.europa.eu/en/document-library/easy-access-rules/easy-access-rules-air-operations-regulation-eu-no-9652012" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 965/2012</a></li>
+                    <li>Load control (herunder lasteplan, vekt og balanse, meldinger/kommunikasjon, utstedelse av dokumenter)</li>
+                    <li>Ground supervision</li>
+                    <li>Vedlikeholdsarbeid iht. <a href="https://www.easa.europa.eu/en/document-library/regulations/commission-regulation-eu-no-13212014" target="_blank" style="color:var(--caa-blue-light); text-decoration:underline;">(EU) 1321/2014</a>
+                        <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                            <li>Oljeservice</li>
+                            <li>Ekstern vask av flymaskin</li>
+                            <li>Annet vedlikeholdsarbeid, inkl. tauing av fly.</li>
+                        </ul>
+                    </li>
+                    <li>AOC self-handling
+                        <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                            <li>CAT-operasjoner med ikke-komplekse motordrevne fly</li>
+                            <li>Flyoperasjoner med komplekse eller annet-enn-komplekse motordrevne fly som ikke er CAT</li>
+                        </ul>
+                    </li>
+                    <li>Lufthavnsoperatører som utelukkende
+                        <ul style="margin-top:5px; margin-bottom:5px; list-style-type: circle;">
+                            <li>Utfører PRM-tjeneste (personer med redusert mobilitet)</li>
+                            <li>Utfører bakketransport av passasjerer og flybesetning (typisk busstjeneste)</li>
+                        </ul>
+                    </li>
+                </ul><div style="margin-top:20px; font-style:italic; color:#666; font-size:0.85rem;">Ref. (EU) 2025/20 - Artikkel 2 - (3)</div>` 
             }
         ],
         yes: "result_none",
@@ -141,185 +202,152 @@ const steps = [
 const results = {
     "result_none": { 
         title: "Ingen deklarering", 
-        desc: "Virksomheten er ikke omfattet av regelverket, og du trenger ikke å levere samsvarserklæring i henhold til (EU) 2025/20.", 
-        type: "success",
-        icon: '<i class="fas fa-check-circle"></i>'
+        desc: "Virksomheten er ikke omfattet av regelverket, og du trenger ikke å levere samsvarserklæring i henhold til (EU) 2025/20.<br><br><strong>Årsak:</strong> Tjenestene eller lufthavnen faller utenfor forordningens virkeområde.", 
+        type: "res-none" 
     },
     "result_declare": { 
         title: "Krav om samsvarserklæring", 
-        desc: "Virksomheten din er omfattet av regelverket og du må levere samsvarserklæring. Portalen for mottak av erklæringer åpnes tidligst 27. mars 2027.", 
-        type: "warning",
-        icon: '<i class="fas fa-exclamation-triangle"></i>'
+        desc: "Virksomheten din er omfattet av regelverket og du må levere samsvarserklæring.<br><br><strong>Årsak:</strong> Dere utfører regulerte bakketjenester på en EASA-lufthavn.<br><br>Portalen for mottak av erklæringer åpnes tidligst 27. mars 2027.", 
+        type: "res-action" 
     },
     "result_helicopter": {
-        title: "Ingen deklarering (Helikopter)",
-        desc: "Helikopteroperasjoner er unntatt i henhold til forordning (EU) 2025/20. Du trenger ikke å levere samsvarserklæring.",
-        type: "success",
-        icon: '<i class="fas fa-helicopter"></i>'
+        title: "Ingen deklarering (Helikopter-operasjoner)",
+        desc: "Virksomheten er ikke omfattet av regelverket fordi helikopteroperasjoner er unntatt i henhold til forordning (EU) 2025/20.<br><br>Du trenger ikke å levere samsvarserklæring.",
+        type: "res-heli"
     }
 };
 
-/* --- STATER --- */
-let currentStepId = 0;
-let historyStack = [];
-let userSelectedNonEasa = false;
-let isHelicopterCase = false;
+const container = document.getElementById('app-card');
+let historyStack = []; 
 
-/* --- DOM ELEMENTER --- */
-const welcomeScreen = document.getElementById('welcome-screen');
-const questionCard = document.getElementById('question-card');
-const questionTitle = document.getElementById('question-title');
-const questionText = document.getElementById('question-text');
-const optionsContainer = document.getElementById('options-container');
-const secondaryOptionsContainer = document.getElementById('secondary-options-container');
-const lookupContainer = document.getElementById('lookup-container');
-const lookupInput = document.getElementById('icao-input');
-const lookupBtn = document.getElementById('lookup-btn');
-const lookupResult = document.getElementById('lookup-result');
-const resultArea = document.getElementById('result-area');
-const resultBox = document.getElementById('result-box');
-const backBtn = document.getElementById('back-btn');
-const progressBar = document.getElementById('progress-bar');
+function init() { renderStartPage(); }
 
-/* --- EVENT LISTENERS --- */
-document.getElementById('start-btn').addEventListener('click', startFlow);
-backBtn.addEventListener('click', goBack);
-lookupBtn.addEventListener('click', checkAirport);
-lookupInput.addEventListener('keypress', (e) => {
-    if(e.key === 'Enter') checkAirport();
-});
-
-/* --- FUNKSJONER --- */
-
-function startFlow() {
-    welcomeScreen.classList.add('hidden');
-    questionCard.classList.remove('hidden');
-    renderStep(0);
+function restartApp() {
+    historyStack = [];
+    userSelectedNonEasa = false;
+    isHelicopterCase = false;
+    renderStartPage();
 }
 
-function renderStep(stepId) {
-    currentStepId = stepId;
-    const step = steps.find(s => s.id === stepId);
-    
-    // Reset view
-    optionsContainer.innerHTML = '';
-    secondaryOptionsContainer.innerHTML = '';
-    lookupContainer.classList.add('hidden');
-    resultArea.classList.add('hidden');
-    lookupResult.classList.add('hidden');
-    lookupInput.value = '';
-    
-    // Update Content
-    questionTitle.innerText = step.question;
-    questionText.innerHTML = step.subtext || '';
+// Render Start Page
+function renderStartPage() {
+    container.innerHTML = `
+        <div style="text-align:center;">
+            <h2 class="question-title">Er virksomheten min omfattet av regelverket?</h2>
+            <div class="subtext">
+                <p>Denne veilederen hjelper deg å avklare om din organisasjon må levere samsvarserklæring for ground handling i henhold til forordning (EU) 2025/20.</p>
+            </div>
+            
+            <div class="disclaimer">
+                <strong>Viktig informasjon:</strong>
+                Dette verktøyet er kun ment som veiledning. Det er organisasjonens eget ansvar å sette seg inn i og følge gjeldende regelverk.
+                <br><br>
+                Ved behov for avklaring, ta kontakt med Luftfartstilsynet på: <a href="mailto:postmottak@caa.no" style="color:var(--caa-blue-light);">postmottak@caa.no</a>
+            </div>
 
-    // Update Progress Bar
-    const progress = ((stepId) / steps.length) * 100;
-    progressBar.style.width = `${progress}%`;
+            <div class="action-bar action-bar-center">
+                <button class="btn btn-primary" onclick="startFlow()">Start sjekken</button>
+            </div>
+        </div>
+    `;
+}
 
-    // Show Back Button if history exists
-    if (historyStack.length > 0) {
-        backBtn.classList.remove('hidden');
+function startFlow() { renderStep(0); }
+
+function goBack() {
+    if(historyStack.length > 0) {
+        const prevStepId = historyStack.pop();
+        renderStep(prevStepId, false); 
     } else {
-        backBtn.classList.add('hidden');
+        renderStartPage();
+    }
+}
+
+function renderStep(stepId, pushToHistory = true) {
+    const data = steps[stepId];
+    
+    let html = `
+        ${stepId > 0 ? `<button class="btn-back" onclick="goBack()">← Tilbake</button>` : ''}
+        <h2 class="question-title">${data.question}</h2>
+        ${data.subtext ? `<div class="subtext">${data.subtext}</div>` : ''}
+    `;
+
+    if (data.lookupWidget) {
+        html += `
+        <div class="airport-lookup-wrapper">
+            <label style="font-weight:600; display:block;">Søk på navn eller ICAO-kode:</label>
+            <div class="lookup-input-group">
+                <input type="text" id="icao-input" class="lookup-input" placeholder="Eks. ENGM" onkeypress="if(event.key === 'Enter') checkAirport()">
+                <button class="btn btn-primary" onclick="checkAirport()">Sjekk</button>
+            </div>
+            <div id="lookup-result" class="lookup-result"></div>
+        </div>
+        `;
     }
 
-    // Render Details / Accordion if exists
-    if (step.details) {
-        step.details.forEach(d => {
-            const detailsEl = document.createElement('details');
-            detailsEl.innerHTML = `
-                <summary>${d.title}</summary>
-                <div class="details-content">${d.content}</div>
-            `;
-            questionText.appendChild(detailsEl);
+    if (data.details) {
+        data.details.forEach(d => {
+            html += `<details ${d.alwaysOpen ? 'open' : ''}><summary>${d.title}</summary><div class="info-content">${d.content}</div></details>`;
         });
     }
 
-    // Render Logic based on Type
-    if (step.type === 'lookup') {
-        lookupContainer.classList.remove('hidden');
-        // Lookup button logic is handled by specific checkAirport function
-    } 
-    else if (step.type === 'selection') {
-        step.choices.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.className = 'btn-option';
-            btn.innerHTML = `
-                <div class="btn-option-icon">${choice.icon || ''}</div>
-                <div class="btn-option-title">${choice.label}</div>
-                <div class="btn-option-desc">${choice.innerDesc || ''}</div>
-            `;
-            btn.onclick = () => handleResponse(stepId, choice.id);
-            optionsContainer.appendChild(btn);
-        });
+    html += `<div class="action-bar ${data.type !== 'selection' ? 'action-bar-center' : ''}" id="action-area" style="${data.type === 'selection' ? 'flex-direction:column; border:none; padding:0;' : ''}">`;
 
-        if (step.none) {
-            const noneBtn = document.createElement('button');
-            noneBtn.className = 'btn-secondary';
-            noneBtn.innerText = 'Ingen av disse';
-            noneBtn.onclick = () => handleResponse(stepId, 'none');
-            secondaryOptionsContainer.appendChild(noneBtn);
-        }
-    } 
-    else if (step.type === 'yesno') {
-        const yesBtn = document.createElement('button');
-        yesBtn.className = 'btn-option';
-        yesBtn.innerHTML = '<div class="btn-option-title">Ja</div>';
-        yesBtn.onclick = () => handleResponse(stepId, true);
+    if (data.type === 'selection') {
+        const choices = data.choices.map(c => `
+            <div class="selection-option" id="choice-${c.id}" onclick="selectOption('${c.id}')">
+                ${c.icon ? `<div class="sel-icon">${c.icon}</div>` : ''}
+                <span class="sel-label">${c.label}</span>
+                <div class="inner-details">
+                     <details onclick="event.stopPropagation()">
+                        <summary>Les mer</summary>
+                        <div class="info-content">
+                            <strong>${c.innerTitle}</strong><br>
+                            ${c.innerDesc}
+                        </div>
+                    </details>
+                </div>
+            </div>`).join('');
         
-        const noBtn = document.createElement('button');
-        noBtn.className = 'btn-option';
-        noBtn.innerHTML = '<div class="btn-option-title">Nei</div>';
-        noBtn.onclick = () => handleResponse(stepId, false);
-
-        optionsContainer.appendChild(yesBtn);
-        optionsContainer.appendChild(noBtn);
-    }
-}
-
-function handleResponse(stepId, answer) {
-    historyStack.push(stepId);
-    
-    const step = steps.find(s => s.id === stepId);
-    let nextStepKey;
-
-    if (step.type === 'selection') {
-        nextStepKey = (answer === 'none') ? step.none : step.next;
+        html += `
+            <div class="selection-grid">${choices}</div>
+            <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
+                 <button class="btn btn-primary" id="btn-cont" disabled onclick="handleResponse(${stepId}, 'continue')">Fortsett</button>
+                 <button class="btn btn-outline" onclick="handleResponse(${stepId}, 'none')">Ingen av disse</button>
+            </div>
+        `;
     } else {
-        // For Yes/No or Lookup handling
-        nextStepKey = (answer === true) ? step.yes : step.no;
+        const style = data.lookupWidget ? 'display:none;' : '';
+        html += `
+            <button class="btn btn-primary" id="btn-yes" style="${style}" onclick="handleResponse(${stepId}, true)">Ja</button>
+            <button class="btn btn-secondary" id="btn-no" style="${style}" onclick="handleResponse(${stepId}, false)">Nei</button>
+        `;
     }
 
-    // Override logic for Airport Exceptions (Helicopter / Non-EASA)
-    // If user clicked "Continue anyway" (handled as true in checkAirport), 
-    // but we know it's non-EASA, we might want to redirect final result.
-    if (typeof nextStepKey !== 'number' && userSelectedNonEasa) {
-        nextStepKey = isHelicopterCase ? "result_helicopter" : "result_none";
-    }
+    html += `</div>`; 
 
-    if (typeof nextStepKey === 'number') {
-        renderStep(nextStepKey);
-    } else {
-        showResult(nextStepKey);
-    }
+    container.innerHTML = html;
+    window.scrollTo(0,0);
 }
 
 function checkAirport() {
-    let input = lookupInput.value.trim().toUpperCase();
-    lookupResult.classList.remove('hidden');
-    optionsContainer.innerHTML = ''; // Clear previous buttons if any
-
+    let input = document.getElementById(`icao-input`).value.trim().toUpperCase();
+    const resBox = document.getElementById(`lookup-result`);
+    const btnYes = document.getElementById('btn-yes');
+    
+    resBox.style.display = "block";
+    
     let found = airportDB[input];
 
-    // Fuzzy Search
-    if (!found && input.length > 2) {
+    if (!found) {
         const searchStr = input.toLowerCase();
-        for (const [code, data] of Object.entries(airportDB)) {
-            if (data.name.toLowerCase().includes(searchStr)) {
-                found = data;
-                input = code;
-                break;
+        if (searchStr.length > 2) { 
+            for (const [code, data] of Object.entries(airportDB)) {
+                if (data.name.toLowerCase().includes(searchStr)) {
+                    found = data;
+                    input = code; 
+                    break; 
+                }
             }
         }
     }
@@ -328,85 +356,84 @@ function checkAirport() {
         if (found.isHelicopter) {
             userSelectedNonEasa = true;
             isHelicopterCase = true;
-            lookupResult.className = 'lookup-feedback feedback-warning';
-            lookupResult.innerHTML = `<strong>${found.name} (${input})</strong><br>Helikopteroperasjoner er unntatt.`;
+            resBox.className = "lookup-result res-warn";
+            resBox.innerHTML = `<strong>${found.name} (${input})</strong><br>Helikopteroperasjoner er unntatt.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
+            btnYes.style.display = 'inline-block';
+            btnYes.innerText = "Fortsett veilederen likevel";
             
-            createContinueButton("Fortsett veilederen likevel", true);
-        } 
-        else if (!found.easa) {
+        } else if (!found.easa) {
             userSelectedNonEasa = true;
             isHelicopterCase = false;
-            lookupResult.className = 'lookup-feedback feedback-error';
-            lookupResult.innerHTML = `<strong>${found.name} (${input})</strong> er IKKE en EASA-lufthavn.<br>Du er sannsynligvis unntatt.`;
-            
-            createContinueButton("Fortsett veilederen likevel", true);
-        } 
-        else {
+            resBox.className = "lookup-result res-bad";
+            resBox.innerHTML = `<strong>${found.name} (${input})</strong> er IKKE en EASA-lufthavn.<br><br>Virksomheten er dermed unntatt krav om å levere samsvarserklæring.`;
+            btnYes.style.display = 'inline-block';
+            btnYes.innerText = "Fortsett veilederen likevel";
+
+        } else {
             userSelectedNonEasa = false;
             isHelicopterCase = false;
-            lookupResult.className = 'lookup-feedback feedback-success';
-            lookupResult.innerHTML = `<strong>${found.name} (${input})</strong> er en EASA-lufthavn.`;
-            
-            createContinueButton("Gå videre", true);
+            resBox.className = "lookup-result res-ok";
+            resBox.innerHTML = `<strong>${found.name} (${input})</strong> er en EASA-lufthavn.`;
+            btnYes.style.display = 'inline-block';
+            btnYes.innerText = "Ja, gå videre";
         }
     } else {
-        lookupResult.className = 'lookup-feedback feedback-warning';
-        lookupResult.innerHTML = "Fant ingen treff i listen over norske EASA-lufthavner.";
-        // No continue button if not found? Or maybe "Not in list" button.
-        // For now, simple logic:
+        resBox.className = "lookup-result res-warn";
+        resBox.innerHTML = "Fant ingen treff i listen over norske EASA-lufthavner.";
+        btnYes.style.display = 'none';
     }
 }
 
-function createContinueButton(text, val) {
-    const btn = document.createElement('button');
-    btn.className = 'btn-start'; // Reuse start button style
-    btn.style.marginTop = '20px';
-    btn.innerHTML = `${text} <i class="fas fa-arrow-right"></i>`;
-    btn.onclick = () => handleResponse(0, val);
-    optionsContainer.appendChild(btn);
+function selectOption(id) {
+    document.querySelectorAll('.selection-option').forEach(el => el.classList.remove('selected'));
+    document.getElementById('choice-'+id).classList.add('selected');
+    document.getElementById('btn-cont').disabled = false;
 }
 
-function showResult(key) {
-    const res = results[key];
-    
-    // Hide question elements
-    document.querySelector('.card-content').classList.add('hidden');
-    backBtn.classList.add('hidden');
-    progressBar.style.width = '100%';
+function handleResponse(currentStepId, answer) {
+    historyStack.push(currentStepId);
 
-    // Show result container
-    resultArea.classList.remove('hidden');
+    let next = steps[currentStepId].type === 'selection' ? (answer === 'none' ? steps[currentStepId].none : steps[currentStepId].next) : (answer ? steps[currentStepId].yes : steps[currentStepId].no);
     
-    // Set content
-    const iconContainer = document.getElementById('result-icon-container');
-    
-    if(res.type === 'success') iconContainer.className = 'result-icon-wrapper res-icon-success';
-    else if(res.type === 'warning') iconContainer.className = 'result-icon-wrapper res-icon-warning';
-    else iconContainer.className = 'result-icon-wrapper res-icon-danger';
+    if (typeof next !== 'number' && userSelectedNonEasa) {
+         next = isHelicopterCase ? "result_helicopter" : "result_none";
+    }
 
-    iconContainer.innerHTML = res.icon;
-    document.querySelector('.result-header').innerText = res.title;
-    resultBox.innerHTML = res.desc;
-}
-
-function goBack() {
-    if (historyStack.length > 0) {
-        const prevId = historyStack.pop();
-        // Since handleResponse pushes current step, popping once gets us current step, 
-        // popping again gets previous. Wait, usually we push BEFORE moving.
-        // Let's rely on renderStep not pushing.
-        
-        // Actually, easiest way: pop the history stack to get the ID we came FROM.
-        renderStep(prevId);
-        // We need to pop it again because renderStep doesn't handle history, 
-        // but our handleResponse pushed it. 
-        // Correct logic: The stack contains the path taken.
-        // Current view is NOT in stack. Stack top is previous view.
-        // But in my handleResponse I push currentStepId.
-        // So renderStep(prevId) sets currentStepId = prevId. 
-        // We must remove it from stack so we don't loop.
-        historyStack.pop(); 
+    if (typeof next === 'number') {
+        renderStep(next, false); 
     } else {
-        location.reload();
+        renderResult(next);
     }
 }
+
+function renderResult(key) {
+    const res = results[key];
+    let iconColor = "";
+    let svgIcon = "";
+
+    if (key === "result_declare") {
+        iconColor = "var(--status-success-text)";
+        svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+    } else if (key === "result_helicopter") {
+        iconColor = "var(--status-warning-text)";
+        svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+    } else {
+        iconColor = "var(--status-danger-text)";
+        svgIcon = `<svg viewBox="0 0 24 24"><path fill="${iconColor}" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>`;
+    }
+
+    container.innerHTML = `
+        <div class="result-box">
+            <div class="result-icon">${svgIcon}</div>
+            <h2 class="result-title">${res.title}</h2>
+            <div class="result-desc">${res.desc}</div>
+            <div class="action-bar action-bar-center">
+                <button class="btn btn-secondary" onclick="restartApp()">Start på nytt</button>
+            </div>
+        </div>
+    `;
+    window.scrollTo(0,0);
+}
+
+// Start applikasjonen når skriptet lastes
+init();
