@@ -1,8 +1,12 @@
-/* --- GRUNNLEGGENDE STIL (SORA / CAA STIL) --- */
+/* --- GRUNNLEGGENDE STIL --- */
 :root {
-    --caa-blue: #003057;       
+    /* Farger tilpasset referansebildet (SORA tool header) */
+    --header-bg: #003057;       /* Mørk blå header bakgrunn */
+    --header-item-active: #00182b; /* Enda mørkere blå for aktiv knapp (som SAIL knappen) */
+    --text-white: #ffffff;
+    
     --caa-blue-light: #0056b3; 
-    --caa-bg: #f4f6f8;         
+    --caa-bg: #eef2f5;         /* Litt lysere grå bakgrunn for hele siden */
     --card-bg: #ffffff;
     
     --text-main: #333333;
@@ -34,84 +38,90 @@ body {
     min-height: 100vh;
 }
 
-/* --- HEADER MED LOGO --- */
+/* --- NY HEADER STIL (MATCHER REFERANSEBILDET) --- */
 header {
-    background-color: var(--caa-blue);
-    color: white;
-    padding: 0 20px;
-    height: 70px;
+    background-color: var(--header-bg);
+    color: var(--text-white);
+    height: 60px; /* Mer kompakt høyde */
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 0 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.header-content {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
+.header-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .logo {
-    height: 40px;
+    height: 28px; /* Litt mindre logo for å matche header */
     width: auto;
 }
 
-header h1 {
+.brand-name {
+    font-weight: 700;
     font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-    padding-left: 20px;
-    border-left: 1px solid rgba(255,255,255,0.3);
-    line-height: 1.2;
+    letter-spacing: 0.5px;
 }
 
-/* --- TABS NAVIGATION --- */
-.tabs-container {
-    background-color: #fff;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+.separator {
+    opacity: 0.3;
+    font-size: 1.2rem;
 }
 
-.tabs {
-    max-width: 800px;
-    margin: 0 auto;
+.tool-name {
+    font-weight: 400;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+/* --- NAVIGASJON I HEADER --- */
+.header-nav {
     display: flex;
-    padding: 0 15px;
+    height: 100%;
+    align-items: center;
 }
 
-.tab-btn {
-    background: none;
+.nav-item {
+    background: transparent;
     border: none;
-    padding: 20px 25px;
+    color: var(--text-white);
     font-family: 'Open Sans', sans-serif;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 700; /* Bold tekst som i referansebildet */
+    padding: 0 20px;
+    height: 40px; /* Knapphøyde */
+    margin-left: 10px;
+    border-radius: 4px;
     cursor: pointer;
-    position: relative;
-    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+    opacity: 0.9;
 }
 
-.tab-btn:hover {
-    color: var(--caa-blue);
+.nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 1;
 }
 
-.tab-btn.active {
-    color: var(--caa-blue);
+/* Stil for aktiv fane - ligner på "SAIL" knappen i bildet */
+.nav-item.active {
+    background-color: var(--header-item-active); 
+    opacity: 1;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
 }
 
-.tab-btn.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background-color: var(--caa-blue);
+.nav-icon {
+    font-size: 1.1rem;
+    opacity: 0.8;
 }
 
 /* --- MAIN CONTAINER --- */
@@ -153,20 +163,22 @@ header h1 {
 .flowchart-wrapper {
     text-align: center;
     background: white;
-    padding: 20px;
+    padding: 30px;
     border-radius: var(--radius-main);
     box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-color);
 }
 
 .flowchart-img {
     max-width: 100%;
     height: auto;
     display: block;
-    margin: 0 auto;
+    margin: 20px auto;
+    border-radius: 4px;
 }
 
-/* --- ELEMENTER I VEILEDEREN --- */
-h2.question-title { margin-top: 0; font-size: 1.5rem; color: var(--caa-blue); margin-bottom: 10px; }
+/* --- ELEMENTER I VEILEDEREN (UENDRET) --- */
+h2.question-title { margin-top: 0; font-size: 1.5rem; color: var(--header-bg); margin-bottom: 10px; }
 .subtext { color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.5; }
 
 .btn { display: inline-block; padding: 12px 24px; font-size: 1rem; font-weight: 600; text-align: center; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s, transform 0.1s; text-decoration: none; }
@@ -186,12 +198,12 @@ h2.question-title { margin-top: 0; font-size: 1.5rem; color: var(--caa-blue); ma
 .selection-option { background: #fff; border: 2px solid #e9ecef; border-radius: var(--radius-main); padding: 20px; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .selection-option:hover { border-color: #beccd6; transform: translateY(-2px); }
 .selection-option.selected { border-color: var(--caa-blue-light); background-color: #f0f7ff; box-shadow: 0 0 0 1px var(--caa-blue-light) inset; }
-.sel-icon { width: 40px; height: 40px; margin-bottom: 15px; color: var(--caa-blue); }
+.sel-icon { width: 40px; height: 40px; margin-bottom: 15px; color: var(--header-bg); }
 .sel-icon svg { width: 100%; height: 100%; fill: currentColor; }
-.sel-label { font-weight: 700; color: var(--caa-blue); margin-bottom: 5px; display: block; }
+.sel-label { font-weight: 700; color: var(--header-bg); margin-bottom: 5px; display: block; }
 
 details { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; margin-bottom: 10px; overflow: hidden; }
-summary { padding: 12px 15px; font-weight: 600; cursor: pointer; color: var(--caa-blue); outline: none; }
+summary { padding: 12px 15px; font-weight: 600; cursor: pointer; color: var(--header-bg); outline: none; }
 summary:hover { background-color: #eef2f5; }
 .info-content { padding: 15px; border-top: 1px solid #e9ecef; font-size: 0.95rem; line-height: 1.6; background: #fff; }
 .info-content ul { padding-left: 20px; margin: 0; }
@@ -210,21 +222,22 @@ summary:hover { background-color: #eef2f5; }
 
 .result-box { text-align: center; padding: 20px 0; }
 .result-icon { width: 64px; height: 64px; margin: 0 auto 20px auto; display: block; }
-.result-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--caa-blue); }
+.result-title { font-size: 1.8rem; margin-bottom: 15px; color: var(--header-bg); }
 .result-desc { font-size: 1.1rem; line-height: 1.6; max-width: 600px; margin: 0 auto 30px auto; }
 
-.disclaimer { background-color: #e2e6ea; color: #383d41; padding: 15px; border-radius: 4px; font-size: 0.9rem; margin-top: 20px; border-left: 4px solid var(--caa-blue); }
+.disclaimer { background-color: #e2e6ea; color: #383d41; padding: 15px; border-radius: 4px; font-size: 0.9rem; margin-top: 20px; border-left: 4px solid var(--header-bg); }
 
 .inner-details { font-size: 0.85rem; margin-top: 10px; color: #555; text-align: left; width: 100%; }
 .inner-details summary { font-size: 0.8rem; padding: 5px 0; color: var(--caa-blue-light); }
 .inner-details .info-content { padding: 10px; border: 1px solid #eee; background: #fafafa; }
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
+    header { padding: 0 10px; height: auto; flex-wrap: wrap; gap: 10px; padding-bottom: 10px; }
+    .header-nav { width: 100%; justify-content: center; }
+    .nav-item { flex-grow: 1; justify-content: center; margin: 0 2px; }
     .app-card { padding: 20px; }
     .action-bar { flex-direction: column; }
     .btn { width: 100%; }
     .lookup-input-group { flex-direction: column; }
     .lookup-input { width: 100%; }
-    header h1 { font-size: 0.9rem; }
-    .logo { height: 30px; }
 }

@@ -1,21 +1,21 @@
-// --- TAB SWITCHING LOGIC ---
+// --- TAB SWITCHING LOGIC (OPPDATERT FOR HEADER-MENY) ---
 function switchTab(tabId) {
     // Skjul alt innhold
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    // Deaktiver alle knapper
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    // Deaktiver alle meny-knapper (nav-items)
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
     // Vis valgt innhold
     document.getElementById('view-' + tabId).classList.add('active');
     
-    // Aktiver riktig knapp
-    const buttons = document.querySelectorAll('.tab-btn');
+    // Aktiver riktig knapp i headeren
+    const buttons = document.querySelectorAll('.nav-item');
     if(tabId === 'flowchart') buttons[0].classList.add('active');
     if(tabId === 'interactive') buttons[1].classList.add('active');
 }
 
 
-// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER) --- 
+// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER - UENDRET) --- 
 
 const airportDB = {
     "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
