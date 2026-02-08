@@ -39,7 +39,8 @@ header {
     background-color: var(--caa-blue);
     color: white;
     padding: 0 20px;
-    height: 70px;
+    /* Økt høyde for å få plass til 100px logo + litt luft */
+    height: 140px; 
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -52,21 +53,41 @@ header {
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 30px; /* Litt mer avstand mellom logo og tekst */
 }
 
+/* Logo styling */
 .logo {
-    height: 40px;
+    height: 100px; /* Satt til 100px som ønsket */
     width: auto;
+    display: block; /* Fjerner ekstra mellomrom under bildet */
+    transition: opacity 0.2s;
+}
+
+.logo:hover {
+    opacity: 0.9;
+}
+
+/* Tekst-container i header */
+.header-text {
+    display: flex;
+    flex-direction: column;
+    padding-left: 30px;
+    border-left: 1px solid rgba(255,255,255,0.3);
 }
 
 header h1 {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 600;
     margin: 0;
-    padding-left: 20px;
-    border-left: 1px solid rgba(255,255,255,0.3);
     line-height: 1.2;
+}
+
+.version-text {
+    font-size: 0.9rem;
+    font-weight: 300;
+    opacity: 0.8;
+    margin-top: 4px;
 }
 
 /* --- MAIN CONTAINER --- */
@@ -149,6 +170,9 @@ summary:hover { background-color: #eef2f5; }
     .btn { width: 100%; }
     .lookup-input-group { flex-direction: column; }
     .lookup-input { width: 100%; }
-    header h1 { font-size: 0.9rem; }
-    .logo { height: 30px; }
+    
+    header { height: auto; padding: 20px; flex-direction: column; text-align: center; }
+    .header-content { flex-direction: column; gap: 15px; }
+    .header-text { padding-left: 0; border-left: none; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 15px; width: 100%; }
+    .logo { height: 80px; } /* Litt mindre på veldig små skjermer for å spare plass */
 }
