@@ -1,22 +1,4 @@
-// --- TAB SWITCHING LOGIC ---
-function switchTab(tabId) {
-    // Skjul alt innhold
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-    // Deaktiver alle knapper
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-    // Vis valgt innhold
-    document.getElementById('view-' + tabId).classList.add('active');
-    
-    // Aktiver riktig knapp
-    const buttons = document.querySelectorAll('.tab-btn');
-    if(tabId === 'flowchart') buttons[0].classList.add('active');
-    if(tabId === 'interactive') buttons[1].classList.add('active');
-}
-
-
-// --- VEILEDER LOGIKK (DATABASE OG FUNKSJONER) --- 
-
+// --- DATABASE ---
 const airportDB = {
     "ENGM": { name: "Oslo lufthavn, Gardermoen", easa: true },
     "ENBR": { name: "Bergen lufthavn, Flesland", easa: true },
@@ -74,6 +56,7 @@ const airportDB = {
 let userSelectedNonEasa = false;
 let isHelicopterCase = false;
 
+// --- SPØRSMÅL OG LOGIKK ---
 const steps = [
     {
         id: 0,
@@ -229,7 +212,8 @@ function restartApp() {
     renderStartPage();
 }
 
-// Render Start Page
+// --- RENDERING FUNCTIONS ---
+
 function renderStartPage() {
     container.innerHTML = `
         <div style="text-align:center;">
@@ -435,5 +419,5 @@ function renderResult(key) {
     window.scrollTo(0,0);
 }
 
-// Start applikasjonen når skriptet lastes
+// Start applikasjonen
 init();
